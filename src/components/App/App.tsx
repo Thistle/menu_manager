@@ -5,9 +5,12 @@ import {pushStateLocationPlugin, UIRouter, UIView} from "@uirouter/react";
 import {Root} from "./Root";
 import {Home} from "./Home";
 import {Ingredient} from "../../ResourceManager/resources/Ingredient"
-import ItemsBrowser from "../ItemsBrowser/ItemsBrowser"
-import ItemsEditor from "../ItemsEditor/ItemsEditor"
-import {Recipe} from "../../ResourceManager/resources/Recipe";
+import RecipeEditor from "../recipe/RecipeEditor";
+import IngredientEditor from "../ingredient/IngredientEditor";
+import IngredientsBrowser from "../ingredient/IngredientBrowser";
+import RecipeBrowser from "../recipe/RecipeBrowser";
+import ComponentsBrowser from "../component/ComponentBrowser";
+import ComponentEditor from "../component/ComponentEditor";
 
 let states = [
     {
@@ -23,7 +26,7 @@ let states = [
     {
         name: 'root.home.ingredient_browser',
         url: '/ingredient',
-        component: ItemsBrowser,
+        component: IngredientsBrowser,
         resolve: [{
             token: 'browse',
             resolveFn: () => {
@@ -36,28 +39,27 @@ let states = [
     {
         name: 'root.home.ingredient_editor',
         url: '/ingredient/edit/:itemId',
-        component: ItemsEditor,
-        resolve: [{
-            token: 'edit',
-            resolveFn: () => {
-                return ({
-                    model: new Ingredient()
-                })
-            }
-        }]
+        component: IngredientEditor
     },
     {
         name: 'root.home.recipe_browser',
         url: '/recipe',
-        component: ItemsBrowser,
-        resolve: [{
-            token: 'browse',
-            resolveFn: () => {
-                return ({
-                    model: new Recipe()
-                })
-            }
-        }]
+        component: RecipeBrowser
+    },
+    {
+        name: 'root.home.recipe_editor',
+        url: '/recipe/edit/:itemId',
+        component: RecipeEditor
+    },
+    {
+        name: 'root.home.component_browser',
+        url: '/component',
+        component: ComponentsBrowser
+    },
+    {
+        name: 'root.home.component_editor',
+        url: '/component/edit/:itemId',
+        component: ComponentEditor
     }
 ];
 

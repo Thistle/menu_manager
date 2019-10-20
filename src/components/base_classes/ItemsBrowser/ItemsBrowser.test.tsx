@@ -1,19 +1,23 @@
 import React from 'react';
-import ItemsBrowser from './ItemsBrowser';
-import {Ingredient} from '../../ResourceManager/resources/Ingredient';
+import IngredientBrowser from '../../ingredient/IngredientBrowser';
 
 import {shallow} from "enzyme";
 
 describe('ItemsBrowser tests', () => {
     let wrapper: any;
-    let props = {
-        browse: {
-            model: new Ingredient()
+    let list: any[] = [
+        {
+            thistle_culinary_name: 'culinary_name_1',
+            menu_display_name: 'display_name_1'
+        },
+        {
+            thistle_culinary_name: 'culinary_name_2',
+            menu_display_name: 'display_name_2'
         }
-    };
+    ];
 
     beforeEach(() => {
-        wrapper = shallow(<ItemsBrowser {...props} />);
+        wrapper = shallow(<IngredientBrowser/>);
     });
 
     it('should display loading message until loading completes', () => {
@@ -29,11 +33,10 @@ describe('ItemsBrowser tests', () => {
         expect(wrapper.find('.browser-title').text()).toBe('Ingredients')
     });
 
-    it('should have the correct number of pages', () => {
-
+    it('should render a list with the correct number of items', () => {
+        wrapper.setState({list: list});
+        console.log(wrapper.instance().state);
+        expect(wrapper.update().find('.browser-content').children()).toHaveLength(list.length);
     });
 
-    it('should load the correct browser.', () => {
-
-    });
 });

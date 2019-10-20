@@ -1,0 +1,5 @@
+
+#ingredientsas .IngredientSAS-list {
+    max-height: 200px;
+    overflow-y: scroll;
+}

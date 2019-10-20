@@ -1,6 +1,6 @@
-import {RMModel} from '../base_classes/RMModel';
+import {RMModelBase} from '../base_classes/RMModelBase';
 
-export class Recipe extends RMModel {
+export class Recipe extends RMModelBase {
     public _resource = 'recipe';
     public _model = 'Recipe';
 
@@ -18,9 +18,13 @@ export class Recipe extends RMModel {
     }
 }
 
-export class RecipeIngredient extends RMModel {
+export class RecipeIngredient extends RMModelBase {
     public _resource = 'recipe';
     public _model = 'RecipeIngredient';
+
+    quantity: number = 0;
+    recipe: any = null;
+    base_ingredient: any = null;
 
     public constructor() {
         super();

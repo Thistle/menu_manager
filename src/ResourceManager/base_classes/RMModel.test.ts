@@ -4,14 +4,14 @@ jest.mock('../base_classes/Service');
 
 //const mockedService = Service as jest.
 
-describe('instantiating RMModel', () => {
+describe('instantiating RMModelBase', () => {
     let o: Component;
 
     beforeEach(() => {
         o = new Component();
     });
 
-    it('should graft model data to RMModel', async () => {
+    it('should graft model data to RMModelBase', async () => {
         let t = await o.load(1);
         expect(t.name).toEqual('test_name');
         //expect(Service.mock.instances[0].get).toHaveBeenCalledTimes(1);
@@ -39,7 +39,7 @@ describe('loading RMMODEL data', () => {
     });
 });
 
-describe('saving RMModel data', () => {
+describe('saving RMModelBase data', () => {
 
 });
 

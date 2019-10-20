@@ -1,55 +1,42 @@
-import React, {Component} from "react";
+import React from "react";
 import {Allergen, Ingredient, Preparation} from "../../ResourceManager/resources/Ingredient";
 import {RecipalIngredient} from "../../ResourceManager/resources/Recipal";
 import InputWidget from "../widgets/InputWidget/InputWidget"
+import ButtonWidget from "../widgets/ButtonWidget/ButtonWidget";
+import ItemsEditor from "../base_classes/ItemsEditor/ItemsEditor";
 
-interface IIngredientEditorState {
-    is_loading: boolean,
-    model: any,
-    allergens: Array<Number>,
-    preparations: Array<Number>,
-    recipal_ingredients: Array<any>
-}
-
-export default class IngredientEditor extends Component<any, IIngredientEditorState> {
-    state: IIngredientEditorState;
+export default class IngredientEditor extends ItemsEditor<any> {
 
     constructor(props: any) {
-        super(props);
-        this.state = {
-            is_loading: true,
-            model: props.model,
+        super(props, new Ingredient(), {
             allergens: [],
             preparations: [],
-            recipal_ingredients: []
-        };
+            recipal_ingredients: [],
+            add_allergen_btn_mode: 'active',
+            loading_extras: true
+        });
     }
 
-    handleOnChange = (e: any) => {
-        e.preventDefault();
-        this.props.updateProperty(e.target.id, e.target.value, false);
+    handleButtonWidgetClicked = (target_element_id: string) => {
+        switch (target_element_id) {
+            case 'available-allergens':
+                this.handleAddAllergen();
+                break;
+        }
     };
 
-    handleOnBlur = (e: any) => {
-        e.preventDefault();
-        this.props.updateProperty(e.target.id, e.target.value, true);
-    };
-
-    handleInputWidgetUpdate = (id: string, value: any) => {
-        this.props.updateProperty(id, value, true);
-    };
-
-    handleAddAllergen = (e: any) => {
-        e.preventDefault();
-        const id = parseInt((document.getElementById('allergens') as any).value);
-        if (!this.addAllergenToModel(id)) window.alert(`That allergen has already been added.`);
+    handleAddAllergen = () => {
+        this.setState({add_allergen_btn_mode: 'disabled'});
+        if (!this.addAllergenToModel(parseInt((document.getElementById('available-allergens') as any).value)))
+            window.alert(`That allergen has already been added.`);
+        this.setState({add_allergen_btn_mode: 'active'});
     };
 
     addAllergenToModel = (id: number): boolean => {
         if ((this.state.model as Ingredient).allergens.indexOf(id) > -1) return false;
 
         this.state.model.allergens.push(id);
-        this.props.updateProperty('allergens', this.state.model.allergens);
+        this.updateProperty('allergens', this.state.model.allergens);
         return true
     };
 
@@ -64,7 +51,7 @@ export default class IngredientEditor extends Component<any, IIngredientEditorSt
         if (index > -1) {
             this.state.model.allergens.splice(index, 1);
         }
-        this.props.updateProperty('allergens', this.state.model.allergens);
+        this.updateProperty('allergens', this.state.model.allergens);
     };
 
     handleAddNewPreparation = (e: any) => {
@@ -80,7 +67,7 @@ export default class IngredientEditor extends Component<any, IIngredientEditorSt
         });
         if (matches.length > 0) return false;
         this.setState({is_loading: true});
-        new Preparation().objects.add({description: new_preparation})
+        new Preparation().objects.create({description: new_preparation})
             .then((added_preparation) => {
                     this.state.preparations.push(added_preparation);
                     this.setState({
@@ -93,6 +80,7 @@ export default class IngredientEditor extends Component<any, IIngredientEditorSt
     };
 
     componentDidMount = () => {
+        super.componentDidMount();
         Promise.all([
             new Allergen().objects.all(),
             new Preparation().objects.all(),
@@ -100,7 +88,7 @@ export default class IngredientEditor extends Component<any, IIngredientEditorSt
         ])
             .then((values) => {
                 this.setState({
-                    is_loading: false,
+                    loading_extras: false,
                     allergens: values[0].results,
                     preparations: values[1].results,
                     recipal_ingredients: values[2].results
@@ -108,9 +96,7 @@ export default class IngredientEditor extends Component<any, IIngredientEditorSt
             })
     };
 
-    render() {
-        if (this.state.is_loading) return (<div>Loading...</div>);
-
+    formContent = () => {
         let allergen_names: any = {};
         const available_allergens = this.state.allergens.map((allergen: any) => {
             allergen_names[allergen.id] = allergen.name;
@@ -139,7 +125,7 @@ export default class IngredientEditor extends Component<any, IIngredientEditorSt
                     value={preparation.id}>{preparation.description}</option>);
         const attached_preparations = this.state.model.preparations.map((preparation: any) => {
             return (
-                <div className={'row list-item'} key={`${preparation.name}_preparation_option`}>
+                <div className={'row list-item'} key={`attached_preparation_${preparation.id}`}>
                     <div className={'col-10'}>
                         {preparation.name}
                     </div>
@@ -165,10 +151,10 @@ export default class IngredientEditor extends Component<any, IIngredientEditorSt
                             <form className={'form-group'}>
                                 <div className={'row'}>
                                     <div className={'col-md-6 col-sm-12'}>
-                                        <label htmlFor="thistle_culinary_name">Thistle Culinary Name</label>
+                                        <label htmlFor="thistle_culinary_namex">Thistle Culinary Name</label>
                                         <InputWidget
                                             id={'thistle_culinary_name'}
-                                            initial_value={this.props.model.thistle_culinary_name}
+                                            initialValue={this.state.model.thistle_culinary_name}
                                             onHandleUpdate={this.handleInputWidgetUpdate}
                                         />
                                     </div>
@@ -176,7 +162,7 @@ export default class IngredientEditor extends Component<any, IIngredientEditorSt
                                         <label htmlFor="menu_display_name">Menu Name</label>
                                         <InputWidget
                                             id={'menu_display_name'}
-                                            initial_value={this.props.model.menu_display_name}
+                                            initialValue={this.state.model.menu_display_name}
                                             onHandleUpdate={this.handleInputWidgetUpdate}
                                         />
                                     </div>
@@ -184,7 +170,7 @@ export default class IngredientEditor extends Component<any, IIngredientEditorSt
                                 <div className={'row'}>
                                     <div className={'col-md-6 col-sm-12'}>
                                         <label htmlFor="is_organic">Is Organic</label>
-                                        <select value={this.props.model.is_organic}
+                                        <select value={this.state.model.is_organic}
                                                 className={'form-control'}
                                                 id={`is_organic`}
                                                 name={'is_organic'}
@@ -198,7 +184,7 @@ export default class IngredientEditor extends Component<any, IIngredientEditorSt
                                 <div className={'row'}>
                                     <div className={'col-12'}>
                                         <label htmlFor="recipal_ingredient">Recipal Ingredient</label>
-                                        <select value={this.props.model.recipal_ingredient}
+                                        <select value={this.state.model.recipal_ingredient}
                                                 className={'form-control'}
                                                 id={`recipal_ingredient`}
                                                 onChange={(e) => this.handleOnBlur(e)}>
@@ -221,16 +207,23 @@ export default class IngredientEditor extends Component<any, IIngredientEditorSt
                                     </div>
                                     <div className={'row'}>
                                         <div className={'col-10 '}>
-                                            <select className={'form-control'} id={'allergens'} name={'allergens'}>
+                                            <select className={'form-control'} id={'available-allergens'}
+                                                    name={'allergens'}>
                                                 {
                                                     available_allergens
                                                 }
                                             </select>
                                         </div>
                                         <div className={'col-2'}>
-                                            <button className={'bg-success text-white'} id={'add_allergen_btn'}
-                                                    onClick={(e) => this.handleAddAllergen(e)}>+
-                                            </button>
+                                            <ButtonWidget
+                                                id={'add-allergen-btn'}
+                                                label={'+'}
+                                                onClickHandler={this.handleButtonWidgetClicked}
+                                                classes={'bg-success text-white'}
+                                                mode={this.state.add_allergen_btn_mode}
+                                                target_element_id={'available-allergens'}
+                                            />
+
                                         </div>
                                     </div>
                                     <hr/>

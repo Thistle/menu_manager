@@ -1,8 +1,8 @@
-import {RMModel} from '../base_classes/RMModel';
+import {RMModelBase} from '../base_classes/RMModelBase';
 
-export class RecipalIngredient extends RMModel {
+export class RecipalIngredient extends RMModelBase {
     public _resource = 'recipal';
-    public _model = 'recipal_ingredient';
+    public _model = 'recipalIngredient';
 
     public recipal_id: number = -1;
     public name: string = '';

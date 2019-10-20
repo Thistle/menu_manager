@@ -1,6 +1,6 @@
-import {RMModel} from '../base_classes/RMModel';
+import {RMModelBase} from '../base_classes/RMModelBase';
 
-export class Ingredient extends RMModel {
+export class Ingredient extends RMModelBase {
     public _resource = 'ingredient';
     public _model = 'ingredient';
 
@@ -27,7 +27,7 @@ export class Ingredient extends RMModel {
     }
 }
 
-export class Allergen extends RMModel {
+export class Allergen extends RMModelBase {
     public _resource = 'ingredient';
     public _model = 'allergen';
 
@@ -39,7 +39,7 @@ export class Allergen extends RMModel {
     }
 }
 
-export class Preparation extends RMModel {
+export class Preparation extends RMModelBase {
     public _resource = 'ingredient';
     public _model = 'preparation';
 

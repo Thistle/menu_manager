@@ -1,3 +1,7 @@
+/*
+    Basic Service. Is used primarily by RMModelBase.
+    Available to non ResourceManager consumers.
+ */
 export interface IServiceRequest {
     url: string;
     content?: any;
@@ -6,7 +10,7 @@ export interface IServiceRequest {
 export default class Service {
     private _service_url: string = `${process.env.REACT_APP_API_SERVER}/resource_manager/`;
 
-    private _execute(url: string, args: any): Promise<any> {
+    private api(url: string, args: any): Promise<any> {
         Object.assign(args, {
             headers: {
                 'Content-Type': 'application/json'
@@ -15,31 +19,39 @@ export default class Service {
         return (
             fetch((url.startsWith('http') ? url : this._service_url + url), args)
                 .then(response => {
-                    return (response.json())
+                    if (!response.ok) return Promise.reject(response);
+                    return ((args.method !== 'DELETE') ? response.json() : '')
                 })
         )
     };
 
     public get<T>(url: string, content?: any): Promise<T> {
-        return this._execute(url, {});
+        return this.api(url, {});
     }
 
     public post<T>(url: string, content: any): Promise<T> {
-        return this._execute(url, {
+        return this.api(url, {
             method: 'POST',
             body: JSON.stringify(content)
         })
     }
 
+    public patch<T>(url: string, content: any): Promise<T> {
+        return this.api(url, {
+            method: 'PATCH',
+            body: JSON.stringify(content)
+        })
+    }
+
     public put<T>(url: string, content: any): Promise<T> {
-        return this._execute(url, {
+        return this.api(url, {
             method: 'PUT',
             body: JSON.stringify(content)
         })
     }
 
     async delete<T>(url: string): Promise<T> {
-        return await this._execute(url, {method: 'DELETE'})
+        return await this.api(url, {method: 'DELETE'})
     }
 
 }

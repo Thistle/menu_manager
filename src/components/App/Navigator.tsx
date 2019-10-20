@@ -18,14 +18,10 @@ export default () => {
                         </UISref>
                     </li>
                     <li className="nav-item" data-toggle="collapse" data-target=".navbar-collapse.show">
-                        <UISref className="nav-link" to="/meal">
-                            <div>Meals</div>
-                        </UISref>
+                        <UISref className="nav-link" to=".meal_browser"><p>meals</p></UISref>
                     </li>
                     <li className="nav-item" data-toggle="collapse" data-target=".navbar-collapse.show">
-                        <UISref className="nav-link" to="/component">
-                            <div>Components</div>
-                        </UISref>
+                        <UISref className="nav-link" to=".component_browser"><p>Components</p></UISref>
                     </li>
                     <li className="nav-item" data-toggle="collapse" data-target=".navbar-collapse.show">
                         <UISref className="nav-link" to=".recipe_browser"><p>Recipes</p></UISref>

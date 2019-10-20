@@ -1,3 +1,6 @@
+/*
+    Not in use
+ */
 import React from 'react';
 
 export default (props: any) => {

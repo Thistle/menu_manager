@@ -10,9 +10,11 @@ describe('InputWidget widget tests', () => {
     const onHandleUpdate = jest.fn();
 
     beforeEach(() => {
-        wrapper = shallow(<InputWidget initial_value={'initial_value_text'}
-                                       onHandleUpdate={onHandleUpdate}
-                                       placeholder={'test_placeholder'}
+        wrapper = shallow(<InputWidget
+            id={'test_id'}
+            initialValue={'initial_value_text'}
+            onHandleUpdate={onHandleUpdate}
+            placeholder={'test_placeholder'}
         />);
         input_element = wrapper.find('input');
     });
@@ -53,4 +55,33 @@ describe('InputWidget widget tests', () => {
             .simulate('keypress', {key: 'Enter'});
         expect(spy).toHaveBeenCalledTimes(0);
     });
+
+    describe('defaultUpdateValue testing', () => {
+        beforeEach(() => {
+            wrapper = shallow(<InputWidget
+                id={'test_id'}
+                initialValue={'initial_value_text'}
+                onHandleUpdate={onHandleUpdate}
+                placeholder={'test_placeholder'}
+                defaultUpdateValue={'hello'}
+            />);
+            wrapper.instance().setState({currentValue: ''});
+            input_element = wrapper.find('input');
+            onHandleUpdate.mockClear();
+        });
+
+        it('should send empty string if defaultUpdateValue is not set', () => {
+            wrapper.instance().sendUpdate();
+            expect(onHandleUpdate).toHaveBeenCalledTimes(1);
+            expect(onHandleUpdate).toHaveBeenCalledWith('test_id', '');
+        });
+
+        it('should send defaultUpdateValue instead of empty string', () => {
+            wrapper.instance().setState({defaultUpdateValue: 'default_value'});
+            wrapper.instance().sendUpdate();
+            expect(onHandleUpdate).toHaveBeenCalledTimes(1);
+            expect(onHandleUpdate).toHaveBeenCalledWith('test_id', 'default_value');
+        });
+    })
+
 });
