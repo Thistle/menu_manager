@@ -5,7 +5,7 @@
                     classes: string to add to the BUTTON CLASSNAME property
                     label: text displayed in the button
                     onClickHandler: callback
-                    mode: 'active' / 'disabled'
+                    mode: 'active' / 'disabled' { should be controlled }
                     target_element_id: This ID can be used to identify what element this button is related to.
                     />
  */

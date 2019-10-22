@@ -19,15 +19,16 @@ export default class IngredientEditor extends ItemsEditor<any> {
     }
 
     handleButtonWidgetClicked = (target_element_id: string) => {
-        switch (target_element_id) {
-            case 'available-allergens':
+            if (target_element_id === 'available-allergens') {
                 this.addAllergen();
-                break;
-        }
+            }else{
+                window.alert(`Invalid button widget ID: ${target_element_id}`);
+            }
     };
 
     addAllergen = () => {
         this.setState({add_allergen_btn_mode: 'disabled'});
+
         let id = parseInt((document.getElementById('available-allergens') as any).value);
         this.updateProperty('allergens', this.state.model.allergens.concat({id: id}))
             .then(() => {
@@ -37,15 +38,12 @@ export default class IngredientEditor extends ItemsEditor<any> {
 
     removeAllergen = (allergenIdToRemove: number) => {
         if (!window.confirm('Are you sure you want to remove this allergen?')) return;
+
         this.updateProperty('allergens', this.state.model.allergens.filter((allergen: any) => {
-            if (allergen.id !== allergenIdToRemove) return allergen
-        })).then(() => {
-            this.setState({model: this.state.model});
-        })
+                                                        if (allergen.id !== allergenIdToRemove) return allergen }))
     };
 
     handleAddNewPreparation = (e: any) => {
-        console.log(e);
         e.preventDefault();
         const preparation = (document.getElementById('new-preparation-InputWidget') as any).value;
         if (!this.addPreparation(preparation)) window.alert(`That preparation has already been added.`);
@@ -53,9 +51,9 @@ export default class IngredientEditor extends ItemsEditor<any> {
 
     addPreparation = (new_preparation: string) => {
         const matches = this.state.preparations.filter((preparation: any) => {
-            return preparation.description === new_preparation;
-        });
+            return preparation.description === new_preparation;});
         if (matches.length > 0) return false;
+
         this.setState({is_loading: true});
         new Preparation().objects.create({description: new_preparation})
             .then((added_preparation) => {
@@ -64,23 +62,18 @@ export default class IngredientEditor extends ItemsEditor<any> {
                         is_loading: false,
                         preparations: this.state.preparations
                     })
-                }
-            );
+                });
+
         return true;
     };
 
     updateRecipalIngredient = (id: number, modeNameN: any, value: any) => {
-        this.updateProperty('recipal_ingredient', {id: id, name: value})
-            .then((r: any) => {
-                this.state.model.reload()
-                    .then((r: any) => {
-                        this.setState({model: this.state.model})
-                    })
-            })
+        this.updateProperty('recipal_ingredient', {id: id, name: value});
     };
 
     componentDidMount = () => {
         super.componentDidMount();
+
         Promise.all([
             new Allergen().objects.all(),
             new Preparation().objects.all(),
@@ -94,14 +87,16 @@ export default class IngredientEditor extends ItemsEditor<any> {
                     recipal_ingredients: values[2].results
                 })
             })
+            .catch((e: any) => {
+                window.alert(`unable to load extras:\n\n${e}`)
+            })
     };
 
     formContent = () => {
-        let allergen_names: any = {};
         const available_allergens = this.state.allergens.map((allergen: any) => {
-            allergen_names[allergen.id] = allergen.name;
             return (<option key={`allergen_${allergen.id}`} value={allergen.id}>{allergen.name}</option>)
         });
+
         const attached_allergens = this.state.model.allergens.map((allergen: any) => {
             return (
                 <div className={'row list-item'} key={`${allergen.name}_allergen_option`}>
@@ -119,9 +114,11 @@ export default class IngredientEditor extends ItemsEditor<any> {
                 </div>
             )
         });
+
         const available_preparations = this.state.preparations.map((preparation: any) =>
             <option key={`preparation_${preparation.id}`}
                     value={preparation.id}>{preparation.description}</option>);
+
         const attached_preparations = this.state.model.preparations.map((preparation: any) => {
             return (
                 <div className={'row list-item'} key={`attached_preparation_${preparation.id}`}>
@@ -183,7 +180,7 @@ export default class IngredientEditor extends ItemsEditor<any> {
                                         <input id={'recipal-ingredient'}
                                                className={'form-control disabled'}
                                                disabled={true}
-                                               value={this.state.model.recipal_ingredient.name}
+                                               value={(this.state.model.recipal_ingredient !== null)? this.state.model.recipal_ingredient.name:''}
                                         />
                                         <SearchAndSelectWidget id={'recipal-ingredient-sas'}
                                                                searchModels={[

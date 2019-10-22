@@ -8,8 +8,8 @@ import RecipeEditor from "../recipe/RecipeEditor";
 import IngredientEditor from "../ingredient/IngredientEditor";
 import IngredientsBrowser from "../ingredient/IngredientBrowser";
 import RecipeBrowser from "../recipe/RecipeBrowser";
-import ComponentsBrowser from "../component/ComponentBrowser";
-import ComponentEditor from "../component/ComponentEditor";
+import ComponentsBrowser from "../component_dep/ComponentBrowser";
+import ComponentEditor from "../component_dep/ComponentEditor";
 import MealsBrowser from "../meal/MealBrowser";
 import MealEditor from "../meal/MealEditor";
 

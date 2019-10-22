@@ -1,5 +1,5 @@
 /*
-    Can be placed on any page to allow ability to create a new API model.
+    Can be placed on any page to allow ability to create a new RM model.
 
     <AddItemWidget  model: RMModelBase object
                     itemNameField: every RMModelBase needs at least 1 field to create the model. This is the field in the
@@ -41,13 +41,6 @@ export default class AddItemWidget extends Component <IProps, IState> {
         })
             .then((response) => {
                 window.location.href = `/home/${this.props.model.modelName}/edit/${response.id}`;
-            })
-            .catch((error) => {
-                console.log(error.status);
-                let error_message: string = 'Unknown Reason';
-                if (error.status === 400) error_message = `An entry with that name already exists.`;
-                window.alert(`Error:\n${error_message}`);
-                this.setState({button_mode: 'active'});
             })
     };
 

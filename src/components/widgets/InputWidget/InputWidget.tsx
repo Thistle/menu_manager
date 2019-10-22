@@ -63,7 +63,8 @@ export default class InputWidget extends Component<IProps, IState> {
     sendUpdate = () => {
         if (this.state.currentValue !== this.lastSavedValue) {
             this.lastSavedValue = this.state.currentValue;
-            let value = (this.state.defaultUpdateValue !== '' && this.state.currentValue === '') ? this.state.defaultUpdateValue : this.state.currentValue;
+            let value = (this.state.defaultUpdateValue !== '' && this.state.currentValue === '') ?
+                this.state.defaultUpdateValue : this.state.currentValue;
             this.props.onUpdate(this.props.id, value);
             clearInterval(this.timer);
         }
@@ -82,14 +83,13 @@ export default class InputWidget extends Component<IProps, IState> {
                         <textarea
                             className={'form-control iw'}
                             id={this.props.id}
+                            defaultValue={this.state.currentValue}
                             onBlur={() => this.sendUpdate()}
                             onChange={(e) => this.handleOnChange(e)}
                             onInput={(e) => this.handleOnChange(e)}
                             onKeyUp={(e) => this.handleOnChange(e)}
                             onKeyDown={(e) => this.handleOnKeyPress(e)}
-                        >
-                            {this.state.currentValue}
-                        </textarea>
+                        />
                     </div>
                 </div>
             )

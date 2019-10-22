@@ -37,15 +37,14 @@ export default class SearchAndSelectWidget extends Component<IProps, any> {
     constructor(props: any) {
         super(props);
         this.state = {
-            isSearching: false,
-            list: []
+            list: null
         };
     }
 
     handleInputWidgetUpdated = (id: string, searchPattern: string) => this.search(searchPattern);
 
-    search = (searchPattern: String) => { /* id is for compatibility with callback from InputWidget */
-        this.setState({isSearching: true});
+    search = (searchPattern: String) => {
+        this.setState({list: null});
         Promise.all(this.props.searchModels.map((searchModel: any) => searchModel.model.objects.search(searchPattern)))
             .then((values) => {
                 let list: any [] = [];
@@ -53,7 +52,6 @@ export default class SearchAndSelectWidget extends Component<IProps, any> {
                     list = list.concat(this.buildListFromResults(values[x].results, this.props.searchModels[x]));
 
                 this.setState({
-                    isSearching: false,
                     list: list
                 });
             })
@@ -72,9 +70,7 @@ export default class SearchAndSelectWidget extends Component<IProps, any> {
         });
     };
 
-    componentDidMount = () => {
-        this.search('');
-    };
+    componentDidMount = () => this.search('');
 
     render() {
         return (
@@ -85,9 +81,8 @@ export default class SearchAndSelectWidget extends Component<IProps, any> {
                                  onUpdate={this.handleInputWidgetUpdated}/>
                     <div className={'row SAS-list form-control'} style={{height: '200px'}}>
                         <div className={'col-12'}>
-                            {!this.state.isSearching
-                            &&
-                            <div>{this.state.list}</div>
+                            {!this.state.list &&
+                                <div>{this.state.list}</div>
                             }
                         </div>
                     </div>

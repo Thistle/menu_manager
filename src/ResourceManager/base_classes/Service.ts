@@ -1,12 +1,7 @@
 /*
     Basic Service. Is used primarily by RMModelBase.
-    Available to non ResourceManager consumers.
+    Available to non RM consumers.
  */
-export interface IServiceRequest {
-    url: string;
-    content?: any;
-}
-
 export default class Service {
     private _service_url: string = `${process.env.REACT_APP_API_SERVER}/resource_manager/`;
 

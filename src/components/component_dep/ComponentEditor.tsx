@@ -1,10 +1,9 @@
 import React, {Fragment} from 'react';
 import ItemsEditor from "../base_classes/ItemsEditor/ItemsEditor";
-import {Component} from "../../ResourceManager/resources/Menu";
+import {Component, Recipe} from "../../ResourceManager/resources/Menu";
 import InputWidget from "../widgets/InputWidget/InputWidget";
 import {InventoryPackaging} from "../../ResourceManager/resources/Inventory";
 import SearchAndSelectWidget from "../widgets/SearchAndSelectWidget/SearchAndSelectWidget";
-import {Recipe} from "../../ResourceManager/resources/Recipe";
 
 export default class ComponentEditor extends ItemsEditor<any> {
 

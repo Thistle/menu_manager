@@ -1,17 +1,6 @@
 import {IModel, RMModelBase} from '../base_classes/RMModelBase';
-import {Recipe} from "./Recipe";
-import {InventoryPackaging} from "./Inventory";
 
 interface IMenuItem extends IModel {
-    name: string;
-}
-
-export class Menu extends RMModelBase implements IMenuItem {
-    public _resource: string = 'menu';
-    public _model = 'Menu';
-
-    name: string = '';
-
 }
 
 export class Meal extends RMModelBase implements IMenuItem {
@@ -45,18 +34,52 @@ export class Component extends RMModelBase implements IMenuItem {
     public _resource = 'menu';
     public _model = 'Component';
 
-    name: string = '';
-    serving_amount: number = 0;
-    suggested_serving: number = 0; // default=0, choices=((0, 'oz'), (1, 'ea'), (2, 'fl oz'))
-    standalone: boolean = false;
-    consumption_yield: number = 0;
-    servings: number = 0;
+    serving_amount: number = 0.0;
     container: any = null;
     recipe: any = null;
+    kitchen_instructions: string = '';
+    meal: any = null;
 
     public constructor() {
         super();
         this.init();
     }
 
+}
+
+export class Recipe extends RMModelBase {
+    public _resource = 'recipe';
+    public _model = 'Recipe';
+
+    public name: string = '';
+    public slug: string = '';
+    public version: string = '';
+    public buffer: number = 0.0;
+    public has_been_reviewed: boolean = false;
+    public suggested_serving: number = 1;
+    public suggested_serving_unit:number = 0;  //choices=((0, 'oz'), (1, 'ea'), (2, 'fl oz')))
+    public consumption_yield: number = 0.0;
+    public servings: number = 0.0;
+    public recipal_results: string = '';
+
+    //instructions = models.ForeignKey('RecipeInstructions', null=True, default=None, related_name='recipes')
+
+    public constructor() {
+        super();
+        this.init();
+    }
+}
+
+export class RecipeIngredient extends RMModelBase {
+    public _resource = 'recipe';
+    public _model = 'RecipeIngredient';
+
+    quantity: number = 0;
+    recipe: any = null;
+    base_ingredient: any = null;
+
+    public constructor() {
+        super();
+        this.init();
+    }
 }

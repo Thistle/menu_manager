@@ -1,7 +1,7 @@
 import React, {Fragment} from "react";
 import {UISref} from "@uirouter/react";
 import ItemsBrowser from "../base_classes/ItemsBrowser/ItemsBrowser";
-import {Recipe} from "../../ResourceManager/resources/Recipe";
+import {Recipe} from "../../ResourceManager/resources/Menu";
 
 export default class RecipeBrowser extends ItemsBrowser<any> {
     constructor(props: any) {

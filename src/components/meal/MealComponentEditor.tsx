@@ -3,16 +3,14 @@
 
  */
 import React, {Component as ReactComponent, Fragment} from 'react';
-import InputWidget from "../widgets/InputWidget/InputWidget";
 import SearchAndSelectWidget from "../widgets/SearchAndSelectWidget/SearchAndSelectWidget";
-import {Recipe} from "../../ResourceManager/resources/Recipe";
 import {InventoryPackaging} from "../../ResourceManager/resources/Inventory";
 import ButtonWidget from "../widgets/ButtonWidget/ButtonWidget";
-import {Component} from "../../ResourceManager/resources/Menu";
+import {Component, Recipe} from "../../ResourceManager/resources/Menu";
 
 export interface IMealComponentEditorProps{
     model: Component,
-    onUpdateComponent: any
+    onFinishedUpdating: any
 }
 
 interface IState{
@@ -35,39 +33,60 @@ export default class MealComponentEditor extends ReactComponent<IMealComponentEd
         };
     }
 
-    updateProperty = (property: string, value: any): Promise<any> => {
+    updateProperty = (property: string, value: any) => {
         return this.state.model.update({[property]: value})
-            .then((r: any) => {
-                this.setState({
-                    model: this.state.model
-                });
-            });
     };
 
     handleInputWidgetUpdate = (id: string, value: any) => {
-        this.updateProperty(id, value);
+        this.updateProperty(id, value)
     };
 
     handleOnBlur = (e: any) => {
-        console.log(e.target.id);
         e.preventDefault();
         this.updateProperty(e.target.id, e.target.value);
     };
 
-    handleSetRecipe = () => {
-
+    setContainer = (e: any) => {
+        this.updateProperty('container', {id: e.target.value})
     };
 
-    updateComponent = () => {
+    setRecipe = (id: number, modelName: string, value: string) => {
+        this.updateProperty('recipe', {id: id, name: value});
+    };
 
+    finishUpdating = () => {
+        if(!this.state.model.hasUnsavedUpdates) {
+            this.props.onFinishedUpdating();
+            return;
+        }
+
+        let errors: string[] = this.formHasErrors();
+        if(errors.length > 0){
+            window.alert(`Component cannot be saved for the following reasons:\n\n${errors.toString()}`);
+            return;
+        }
+
+        this.state.model.save()
+            .then((r: any) => {
+                window.alert('Component has been added to your meal');
+                this.props.onFinishedUpdating();
+            })
+    };
+
+    formHasErrors = (): string[] => {
+        let errors: string[] = [];
+        if(this.state.model.recipe === null) errors.push('No recipe selected');
+        return errors;
     };
 
     cancelUpdating = () => {
-
+        if(this.state.model.id === -1 && this.state.model.hasUnsavedUpdates){
+            if (!window.confirm('This new component has not been saved. Are you sure you want to cancel?')) return
+        }
+        this.props.onFinishedUpdating();
     };
 
     componentDidMount = () => {
-        // load component
         new InventoryPackaging().objects.all()
             .then((values) => {
                 this.setState({
@@ -90,46 +109,13 @@ export default class MealComponentEditor extends ReactComponent<IMealComponentEd
                         <div className={'row'}>
                             <div className={'col-12'}>
                                 <form className={'form-group'}>
-                                    <div className={'row'}>
-                                        <div className={'col-6 col-md-3'}>
-                                            <label htmlFor="serving_amount">Serving Amount</label>
-                                            <InputWidget id={'serving_amount'}
-                                                         initialValue={this.props.model.serving_amount}
-                                                         onUpdate={this.handleInputWidgetUpdate}
-                                            />
-                                        </div>
-                                        <div className={'col-6 col-md-3'}>
-                                            <label htmlFor="serving_amount">Consumption YLD</label>
-                                            <InputWidget id={'consumption_yield'}
-                                                         initialValue={this.props.model.consumption_yield}
-                                                         onUpdate={this.handleInputWidgetUpdate}
-                                            />
-                                        </div>
-                                        <div className={'col-6 col-md-3'}>
-                                            <label htmlFor="serving_amount">Servings</label>
-                                            <InputWidget id={'servings'}
-                                                         initialValue={this.props.model.servings}
-                                                         onUpdate={this.handleInputWidgetUpdate}
-                                            />
-                                        </div>
-                                        <div className={'col-6 col-md-3'}>
-                                            <label htmlFor="serving_amount">Suggested Serv.</label>
-                                            <select id={'suggested_serving'}
-                                                    className={'form-control'}
-                                                    value={this.props.model.suggested_serving}
-                                                    >
-                                                <option value={0}>oz</option>
-                                                <option value={1}>ea</option>
-                                                <option value={2}>fl oz</option>
-                                            </select>
-                                        </div>
-                                    </div>
+
                                     <div className={'row'}>
                                         <div className={'col-12 col-md-6'}>
                                             <label htmlFor="container">Container</label>
                                             <select className={'form-control'}
                                                     id={'container'}
-                                                    onChange={this.handleOnBlur}
+                                                    onChange={this.setContainer}
                                                     value={(this.props.model.container !== null)? this.props.model.container.id:''}
                                             >
                                                 <option value={''}>
@@ -158,8 +144,8 @@ export default class MealComponentEditor extends ReactComponent<IMealComponentEd
                                             />
                                         </div>
                                         <div className={'col-12'}>
-                                            <SearchAndSelectWidget id={'ingredientsas'}
-                                                                   onSelect={this.handleSetRecipe}
+                                            <SearchAndSelectWidget id={'recipeSAS'}
+                                                                   onSelect={this.setRecipe}
                                                                    placeholder={'Enter Recipe Name'}
                                                                    searchModels={[
                                                                        {
@@ -173,16 +159,18 @@ export default class MealComponentEditor extends ReactComponent<IMealComponentEd
                                         <div className={'col-12'}>
                                             <ButtonWidget id={'save-btn'}
                                                           classes={'bg-success text-white'}
-                                                          label={'Save'}
-                                                          onClickHandler={this.updateComponent}
+                                                          label={'Finished'}
+                                                          onClickHandler={this.finishUpdating}
                                                           mode={'active'}
                                                           />
-                                          <ButtonWidget id={'save-btn'}
-                                              classes={'bg-danger text-white'}
-                                              label={'Cancel'}
-                                              onClickHandler={this.cancelUpdating}
-                                              mode={'active'}
-                                              />
+                                            {this.state.model.id === -1 &&
+                                                <ButtonWidget id={'save-btn'}
+                                                          classes={'bg-danger text-white'}
+                                                          label={'Cancel'}
+                                                          onClickHandler={this.cancelUpdating}
+                                                          mode={'active'}
+                                                          />
+                                            }
                                         </div>
                                     </div>
                                 </form>

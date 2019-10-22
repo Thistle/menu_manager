@@ -21,17 +21,14 @@ export default class MealEditor extends ItemsEditor<any> {
 
     addComponent = () => {
         let component: Component = new Component();
-        component.load()
-            .then((r: any) => {
-                this.setState({component_being_edited: component})
-            });
+        this.setState({component_being_edited: component});
     };
 
-    updateComponent = (id: number, modelName: string, value: string) => {
-
+    finishedUpdatingComponent = () => {
+        this.setState({component_being_edited: null})
     };
 
-    updateDate = () => {}
+    updateDate = () => {};
 
     componentDidMount = () => {
         super.componentDidMount();
@@ -102,7 +99,7 @@ export default class MealEditor extends ItemsEditor<any> {
                                             <select className={'form-control'}
                                                     id={'container'}
                                                     onChange={this.handleOnBlur}
-                                                    value={this.state.model.container}>
+                                                    value={(this.state.model.container !== null)? this.state.model.container.id:''}>
                                                 <option value={''}>No Container</option>
                                                 {
                                                     this.state.containers.map((container: any, index: number) => {
@@ -168,7 +165,7 @@ export default class MealEditor extends ItemsEditor<any> {
                         <div id={'component-editor-overlay'} className={'row'}>
                             <div className={'col-12'}>
                                 <MealComponentEditor model={this.state.component_being_edited}
-                                                     onUpdateComponent={this.updateComponent}/>
+                                                     onFinishedUpdating={this.finishedUpdatingComponent}/>
                             </div>
                         </div>
                     }

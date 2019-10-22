@@ -1,7 +1,8 @@
 /*
     Base class for all editors.
+
     Extending class must provide an RMModelBase object in the constructor().
-    Extending class must provide a formContent() to provide the actual content
+    Extending class must provide a formContent() to provide the actual form content
     This class handles updating the provided RMModelBase object.
  */
 import React, {Component, Fragment} from 'react';
@@ -24,14 +25,13 @@ export default class ItemsEditor<T> extends Component<any, any> {
 
     componentDidMount() {
         this.state.model.load(this.state.item_id)
-            .then((response: any) => {
+            .then((r: any) => {
                 this.setState({
                     model: this.state.model,
                     is_loading: false
                 })
             })
-            .catch((r: any) => {
-                window.alert(`Unable to load ${this.state.model.modelName}`)
+            .catch((e: any) => {
                 window.location.href = `/home/${this.state.model.modelName}`;//todo: sort out routing
             })
     };
@@ -39,8 +39,6 @@ export default class ItemsEditor<T> extends Component<any, any> {
     updateProperty = (property: string, value: any): Promise<any> => {
         return this.state.model.update({[property]: value})
             .then((r: any) => {
-                console.log('reload');
-                //(this.state.model as any)[property] = value;
                 this.setState({
                     model: this.state.model
                 });
@@ -52,7 +50,6 @@ export default class ItemsEditor<T> extends Component<any, any> {
     };
 
     handleOnBlur = (e: any) => {
-        console.log(e.target.id);
         e.preventDefault();
         this.updateProperty(e.target.id, e.target.value);
     };
@@ -64,7 +61,9 @@ export default class ItemsEditor<T> extends Component<any, any> {
 
         return (
             <Fragment>
-                {this.formContent()}
+                {
+                    this.formContent()
+                }
             </Fragment>
         )
     }

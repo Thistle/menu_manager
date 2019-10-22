@@ -31,9 +31,7 @@ export abstract class RMModelBase {
     private _objects: ObjectsManager = new ObjectsManager();
     private _service: Service = new Service();
     private _start_data: any = this.getRawModel(this);
-    private _has_loaded: boolean = false;// todo: get rid of this. Test ID instead
     private _in_test_mode: boolean = false;
-    private _is_new: boolean = false; // is used by applications to know if the instance is a placeholder while user creates initial data
 
     // the name expected by the API.
     public get modelName(): string {
@@ -53,10 +51,6 @@ export abstract class RMModelBase {
         return this._start_data
     }
 
-    public get isNew(): boolean{
-        return this._is_new
-    }
-
     public constructor() {
     }
 
@@ -66,53 +60,84 @@ export abstract class RMModelBase {
     }
 
     public load(id: number = -1): Promise<any> {
-        if (this._has_loaded) return Promise.reject({error: 'cannot_be_reloaded'});
-        if (id !== -1){// loading existing model
-            return this._service.get(this.getURL(`${id}/`))
-            .then((response: any) => {
-                this._is_new = true;
-                return (this.synthesize(response));
+        if (this.id !== -1) return Promise.reject({error: 'cannot_be_reloaded'});
+        return this._service.get(this.getURL(`${id}/`))
+            .then((r: any) => {
+                return this.synthesize(r);
             })
-        }else{
+            .catch((e: any) => {
+                this.displayPromiseError('unable to load model', e);
+                return e;
+            })
+    }
+
+    /*
+        save:
+            id == -1 - the object will be created on RM.
+            id > -1 - the object is updated.
+     */
+    public save(): Promise<any> {//todo: testing
+        if (this.id !== -1) {// save
+            return this._service.patch(this.getURL(`${this.id}/`), this._start_data)
+                .then((r: any) => {
+                    return (this.synthesize(r));
+                })
+                .catch((e: any) => {
+                    this.displayPromiseError(`Unable to save model`, e)
+                    return e;
+                })
+        }else{// create
             return this.objects.create(this.getRawModel(this))
-                .then((resp: any) => {
-                    return this.synthesize(resp);
-                });
+                .then((r: any) => {
+                    return this.synthesize(r);
+                })
         }
     }
 
-    public save(): Promise<any> {
-        this._start_data = this.getRawModel(this);
-        return this._service.patch(this.getURL(`${this.id}/`), this._start_data)
-            .then((response: any) => {
-                return (this.synthesize(response));
-            })
-    }
+    /*
+        update: updates to RM, updates own properties, returns updated model data
 
-    public update(properties_to_update: any): Promise<any> {
-        return this._service.patch(this.getURL(`${this.id}/`), properties_to_update)
-            .then((response: any) => {
-                return (this.synthesize(response));
+        if the id == -1, the RM will not be updated, .save() must be called to create the object on the RM.
+
+     */
+    public update(properties_to_update: any): Promise<any> {//todo: testing
+        if (this.id !== -1){// update API if model has already loaded
+            return this._service.patch(this.getURL(`${this.id}/`), properties_to_update)
+            .then((r: any) => {
+                return (this.synthesize(r));
             })
+            .catch((e: any) => {
+                this.displayPromiseError(`Unable to update property`, e);
+                return e
+            })
+        }else{
+            return Promise.resolve(this.synthesize(properties_to_update, false));
+        }
+
     }
 
     public delete(): Promise<any> {
         return this._service.delete(this.getURL(`${this.id}/`))
+            .catch((e: any) => {
+                this.displayPromiseError('unable to delete model', e);
+                return e
+            })
     }
 
-    // Models must call this in their constructor
+    /* Models must call this in their constructor */
     protected init = () => {
         this._start_data = this.getRawModel(this);
         this._objects = new ObjectsManager(this.getURL(), this._service);
     };
 
     /*
-        This function extracts and returns the model specific properties.
+        getRawModel: extracts and returns the model specific properties.
+
         Takes an RMModelBase object.
-        performs JSON.parse creating an object from the RMModelBase without functions.
-        keeps any remaining properties without an underscore at the beginning.
+        performs JSON.parse creating a functionless object from the RMModelBase.
+        strips out properties that begin with '_'.
         This result of this function is often sent directly to the API. Any properties you want to use in your models
-        or RMModelBase that are not part of the API models, should either begin with an underscore or you can use a GETTER.
+          or RMModelBase that are not part of the RM models, should either begin with an underscore or you can use a GETTER.
      */
     private getRawModel(model: RMModelBase): IModel {
         let o: any = {};
@@ -123,12 +148,20 @@ export abstract class RMModelBase {
         return o;
     }
 
-    private synthesize(modelData: any) {
+    /*
+        synthesize: assigns given properties to this
+
+        returns unaltered data.
+     */
+    private synthesize(modelData: any, recordChanges: boolean = false) {
         Object.assign(this, modelData);
-        this._start_data = this.getRawModel(this);
-        this._has_loaded = true;
-        return this._start_data;
+        if (recordChanges) this._start_data = this.getRawModel(this);
+        return modelData;
     }
+
+    private displayPromiseError = (message: string, e: any) => {
+        window.alert(`${message}:\n\n${e}`)
+    };
 
     private getURL = (ext: string = '') => `${this._model.toLowerCase()}/${ext}`;
 }
@@ -143,22 +176,42 @@ export class ObjectsManager {
     public search(searchPattern: string = '', params: any = {}): Promise<any> {
         params['search'] = searchPattern;
         return this.service.get(`${this.resource_url}?${this.buildQuery(params)}`)
+            .catch((e: any) => {
+                this.displayPromiseError('unable to search model', e);
+                return e;
+            })
     }
 
     public all(): Promise<any> {
-        return this.service.get(`${this.resource_url}`);
+        return this.service.get(`${this.resource_url}`)
+        .catch((e: any) => {
+                this.displayPromiseError('unable to perform all() on  model', e);
+                return e;
+            })
     }
 
     public update(id: number, params: any): Promise<any> {
         return this.service.patch(`${this.resource_url}${id}/`, params)
+            .catch((e: any) => {
+                    this.displayPromiseError('unable to update model', e);
+                    return e;
+                })
     };
 
     public create(model_data: any): Promise<any> {
-        return this.service.post(this.resource_url, model_data);
+        return this.service.post(this.resource_url, model_data)
+            .catch((e: any) => {
+                this.displayPromiseError('unable to create model', e);
+                return e;
+            })
     }
 
     public delete(id: number): Promise<any> {
-        return this.service.delete(`${this.resource_url}${id}/`);
+        return this.service.delete(`${this.resource_url}${id}/`)
+            .catch((e: any) => {
+                this.displayPromiseError('unable to delete model', e);
+                return e;
+            })
     }
 
     protected buildQuery(data: any) {
@@ -170,6 +223,10 @@ export class ObjectsManager {
             }
         }
         return query.join('&');
+    };
+
+    private displayPromiseError = (message: string, e: any) => {
+        window.alert(`${message}:\n\n${e}`)
     };
 }
 

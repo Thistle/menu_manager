@@ -9,7 +9,7 @@ import AddItemWidget from "../../widgets/AddItem/AddItemWidget";
 import InputWidget from "../../widgets/InputWidget/InputWidget";
 
 export default class ItemsBrowser<T> extends Component<any, any> {
-    private search_limit: number = 25;
+    private search_limit: number = 25; // ?limit=
     state: any;
     add_item_name = 'name';
 
@@ -39,23 +39,19 @@ export default class ItemsBrowser<T> extends Component<any, any> {
 
     doSearch = (searchPattern: string = '', page: number = 1, offset: number = 0, limit: number = this.search_limit) => {
         this.state.model.objects.search(searchPattern, {limit: limit, page: page, offset: offset})
-            .then((response: any) => {
+            .then((r: any) => {
                 this.setState({
                     is_loading: false,
-                    list: response.results,
+                    list: r.results,
                     pagination: {
                         page: 1,
-                        pages: response.count / limit
+                        pages: r.count / limit
                     }
                 })
             });
     };
 
     formContent = () => <div>implement getFormContent</div>;
-
-    handlePageChange = (new_page: any) => {
-        this.doSearch('', new_page, (new_page - 1) * this.search_limit)
-    };
 
     render() {
         if (this.state.is_loading) return (<div>Loading...</div>);
@@ -81,10 +77,11 @@ export default class ItemsBrowser<T> extends Component<any, any> {
                             placeholder={`Search ${this.state.model.modelName}s`}
                         />
                     </div>
-                    {/*<ResultsPagePicker pagination={this.state.pagination} changePage={this.handlePageChange}/>*/}
                 </div>
                 <Fragment>
-                    {this.formContent()}
+                    {
+                        this.formContent()
+                    }
                 </Fragment>
             </Fragment>
         )

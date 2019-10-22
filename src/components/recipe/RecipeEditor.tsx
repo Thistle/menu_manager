@@ -1,7 +1,7 @@
 import React, {Component, Fragment} from "react";
 import InputWidget from "../widgets/InputWidget/InputWidget";
 import ItemsEditor from "../base_classes/ItemsEditor/ItemsEditor";
-import {Recipe, RecipeIngredient} from "../../ResourceManager/resources/Recipe";
+import {Recipe, RecipeIngredient} from "../../ResourceManager/resources/Menu";
 import SearchAndSelectWidget from "../widgets/SearchAndSelectWidget/SearchAndSelectWidget"
 import "./index.css";
 import {Ingredient} from "../../ResourceManager/resources/Ingredient";
@@ -28,18 +28,11 @@ export default class RecipeEditor extends ItemsEditor<any> {
             .then((response: any) => {
                 this.state.model.ingredients.push(response);
                 this.setState({model: this.state.model});
-            })
-            .catch((error: any) => {
-                window.alert('Unable to add ingredient')
-            })
+            });
     };
 
     updateRecipeIngredientQuantity = (id: number, quantity: number) => {
-        console.log(quantity);
-        this.recipeIngredientCTRL.objects.update(id, {quantity})
-            .catch((response: any) => {
-                window.alert('Unable to update ingredient.')
-            })
+        this.recipeIngredientCTRL.objects.update(id, {quantity});
     };
 
     deleteRecipeIngredient = (id: number, base_ingredient_name: string) => {
@@ -50,9 +43,6 @@ export default class RecipeEditor extends ItemsEditor<any> {
                     if (ingredient.id !== id) return ingredient;
                 });
                 this.setState({model: this.state.model})
-            })
-            .catch((error: string) => {
-                window.alert(`Unable to remove ingredient:\n\n${error}`)
             })
     };
 
@@ -66,7 +56,7 @@ export default class RecipeEditor extends ItemsEditor<any> {
             />);
         return (
             <div className={'row'}>
-                <div className={'col-md-6 col-12'}>
+                <div className={'col-12'}>
                     <form className={'form-group'}>
                         <div className={'row'}>
                             <div className={'col-md-6 col-12'}>
@@ -87,8 +77,6 @@ export default class RecipeEditor extends ItemsEditor<any> {
                                     <option value={'2'}>meat</option>
                                 </select>
                             </div>
-                        </div>
-                        <div className={'row'}>
                             <div className={'col-md-6 col-12'}>
                                 <label htmlFor="buffer">Buffer</label>
                                 <InputWidget id={'buffer'}
@@ -96,6 +84,47 @@ export default class RecipeEditor extends ItemsEditor<any> {
                                              onUpdate={this.handleInputWidgetUpdate}
                                              defaultUpdateValue={'0'}
                                 />
+                            </div>
+                            <div className={'hidden-sm col-md-6'}></div>
+                            <div className={'col-6 col-md-3'}>
+                                <label htmlFor="consumption_yield">Consumption YLD</label>
+                                <InputWidget id={'consumption_yield'}
+                                             initialValue={this.state.model.consumption_yield}
+                                             onUpdate={this.handleInputWidgetUpdate}
+                                />
+                            </div>
+                            <div className={'col-6 col-md-3'}>
+                                <label htmlFor="servings">Servings</label>
+                                <InputWidget id={'servings'}
+                                             initialValue={this.state.model.servings}
+                                             onUpdate={this.handleInputWidgetUpdate}
+                                />
+                            </div>
+                            <div className={'col-6 col-md-3'}>
+                                <div className={'row'}>
+                                    <div className={'col-12'} style={{paddingTop: '3px', paddingBottom: '3px'}}>
+                                        <b>Suggested Serving</b>
+                                    </div>
+                                </div>
+                                <div className={'row'}>
+                                    <div className={'col-5'}>
+                                        <InputWidget id={'suggested_serving'}
+                                                     initialValue={this.state.model.suggested_serving}
+                                                     onUpdate={this.handleInputWidgetUpdate}
+                                        />
+                                    </div>
+                                    <div className={'col-7'}>
+                                        <select id={'suggested_serving_unit'}
+                                                className={'form-control'}
+                                                onChange={this.handleOnBlur}
+                                                value={this.state.model.suggested_serving_unit}
+                                                >
+                                            <option value={0}>oz</option>
+                                            <option value={1}>ea</option>
+                                            <option value={2}>fl oz</option>
+                                        </select>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </form>
