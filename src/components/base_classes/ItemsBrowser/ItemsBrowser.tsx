@@ -62,7 +62,7 @@ export default class ItemsBrowser<T> extends Component<any, any> {
 
         return (
             <Fragment>
-                <div className={'col-12'}>
+                <div id={'items-browser'} className={'col-12'}>
                     <div className={'row'}>
                         <div className={'col-12 col-md-6'}>
                             <div className={'browser-title'}>
@@ -77,7 +77,7 @@ export default class ItemsBrowser<T> extends Component<any, any> {
                         <InputWidget
                             id={'search-bar'}
                             initialValue={''}
-                            onHandleUpdate={this.handleOnSearch}
+                            onUpdate={this.handleOnSearch}
                             placeholder={`Search ${this.state.model.modelName}s`}
                         />
                     </div>

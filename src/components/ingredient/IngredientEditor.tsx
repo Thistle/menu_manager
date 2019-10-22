@@ -4,6 +4,8 @@ import {RecipalIngredient} from "../../ResourceManager/resources/Recipal";
 import InputWidget from "../widgets/InputWidget/InputWidget"
 import ButtonWidget from "../widgets/ButtonWidget/ButtonWidget";
 import ItemsEditor from "../base_classes/ItemsEditor/ItemsEditor";
+import "./Ingredient.css";
+import SearchAndSelectWidget from "../widgets/SearchAndSelectWidget/SearchAndSelectWidget";
 
 export default class IngredientEditor extends ItemsEditor<any> {
 
@@ -12,46 +14,34 @@ export default class IngredientEditor extends ItemsEditor<any> {
             allergens: [],
             preparations: [],
             recipal_ingredients: [],
-            add_allergen_btn_mode: 'active',
-            loading_extras: true
+            add_allergen_btn_mode: 'active'
         });
     }
 
     handleButtonWidgetClicked = (target_element_id: string) => {
         switch (target_element_id) {
             case 'available-allergens':
-                this.handleAddAllergen();
+                this.addAllergen();
                 break;
         }
     };
 
-    handleAddAllergen = () => {
+    addAllergen = () => {
         this.setState({add_allergen_btn_mode: 'disabled'});
-        if (!this.addAllergenToModel(parseInt((document.getElementById('available-allergens') as any).value)))
-            window.alert(`That allergen has already been added.`);
-        this.setState({add_allergen_btn_mode: 'active'});
+        let id = parseInt((document.getElementById('available-allergens') as any).value);
+        this.updateProperty('allergens', this.state.model.allergens.concat({id: id}))
+            .then(() => {
+                this.setState({add_allergen_btn_mode: 'active'});
+            });
     };
 
-    addAllergenToModel = (id: number): boolean => {
-        if ((this.state.model as Ingredient).allergens.indexOf(id) > -1) return false;
-
-        this.state.model.allergens.push(id);
-        this.updateProperty('allergens', this.state.model.allergens);
-        return true
-    };
-
-    handleRemoveAllergen = (allergen_id: number) => {
+    removeAllergen = (allergenIdToRemove: number) => {
         if (!window.confirm('Are you sure you want to remove this allergen?')) return;
-        this.removeAllergenFromModel(allergen_id);
-    };
-
-    removeAllergenFromModel = (allergen_id: number) => {
-        console.log(allergen_id);
-        const index = this.state.model.allergens.indexOf(allergen_id, 0);
-        if (index > -1) {
-            this.state.model.allergens.splice(index, 1);
-        }
-        this.updateProperty('allergens', this.state.model.allergens);
+        this.updateProperty('allergens', this.state.model.allergens.filter((allergen: any) => {
+            if (allergen.id !== allergenIdToRemove) return allergen
+        })).then(() => {
+            this.setState({model: this.state.model});
+        })
     };
 
     handleAddNewPreparation = (e: any) => {
@@ -79,6 +69,16 @@ export default class IngredientEditor extends ItemsEditor<any> {
         return true;
     };
 
+    updateRecipalIngredient = (id: number, modeNameN: any, value: any) => {
+        this.updateProperty('recipal_ingredient', {id: id, name: value})
+            .then((r: any) => {
+                this.state.model.reload()
+                    .then((r: any) => {
+                        this.setState({model: this.state.model})
+                    })
+            })
+    };
+
     componentDidMount = () => {
         super.componentDidMount();
         Promise.all([
@@ -103,16 +103,15 @@ export default class IngredientEditor extends ItemsEditor<any> {
             return (<option key={`allergen_${allergen.id}`} value={allergen.id}>{allergen.name}</option>)
         });
         const attached_allergens = this.state.model.allergens.map((allergen: any) => {
-            const allergen_name = allergen_names[allergen];
             return (
-                <div className={'row list-item'} key={`${allergen_name}_allergen_option`}>
+                <div className={'row list-item'} key={`${allergen.name}_allergen_option`}>
                     <div className={'col-10'}>
-                        {allergen_name}
+                        {allergen.name}
                     </div>
                     <div className={'col-2'}>
                         <button
                             className={'bg-danger text-white'}
-                            onClick={() => this.handleRemoveAllergen(allergen)}
+                            onClick={() => this.removeAllergen(allergen.id)}
                         >
                             -
                         </button>
@@ -139,9 +138,6 @@ export default class IngredientEditor extends ItemsEditor<any> {
                 </div>
             )
         });
-        const available_recipal_ingredients = this.state.recipal_ingredients.map((ingredient: any) =>
-            <option key={`recipal_ingredient_${ingredient.id}`}
-                    value={ingredient.id}>{ingredient.name}</option>);
 
         return (
             <div className={'row item-editor'}>
@@ -155,7 +151,7 @@ export default class IngredientEditor extends ItemsEditor<any> {
                                         <InputWidget
                                             id={'thistle_culinary_name'}
                                             initialValue={this.state.model.thistle_culinary_name}
-                                            onHandleUpdate={this.handleInputWidgetUpdate}
+                                            onUpdate={this.handleInputWidgetUpdate}
                                         />
                                     </div>
                                     <div className={'col-md-6 col-sm-12'}>
@@ -163,7 +159,7 @@ export default class IngredientEditor extends ItemsEditor<any> {
                                         <InputWidget
                                             id={'menu_display_name'}
                                             initialValue={this.state.model.menu_display_name}
-                                            onHandleUpdate={this.handleInputWidgetUpdate}
+                                            onUpdate={this.handleInputWidgetUpdate}
                                         />
                                     </div>
                                 </div>
@@ -184,14 +180,19 @@ export default class IngredientEditor extends ItemsEditor<any> {
                                 <div className={'row'}>
                                     <div className={'col-12'}>
                                         <label htmlFor="recipal_ingredient">Recipal Ingredient</label>
-                                        <select value={this.state.model.recipal_ingredient}
-                                                className={'form-control'}
-                                                id={`recipal_ingredient`}
-                                                onChange={(e) => this.handleOnBlur(e)}>
-                                            {
-                                                available_recipal_ingredients
-                                            }
-                                        </select>
+                                        <input id={'recipal-ingredient'}
+                                               className={'form-control disabled'}
+                                               disabled={true}
+                                               value={this.state.model.recipal_ingredient.name}
+                                        />
+                                        <SearchAndSelectWidget id={'recipal-ingredient-sas'}
+                                                               searchModels={[
+                                                                   {
+                                                                       model: new RecipalIngredient(),
+                                                                       displayField: 'name'
+                                                                   }]}
+                                                               onSelect={this.updateRecipalIngredient}
+                                        />
                                     </div>
                                 </div>
 

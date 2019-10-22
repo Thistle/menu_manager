@@ -4,13 +4,14 @@ import {pushStateLocationPlugin, UIRouter, UIView} from "@uirouter/react";
 
 import {Root} from "./Root";
 import {Home} from "./Home";
-import {Ingredient} from "../../ResourceManager/resources/Ingredient"
 import RecipeEditor from "../recipe/RecipeEditor";
 import IngredientEditor from "../ingredient/IngredientEditor";
 import IngredientsBrowser from "../ingredient/IngredientBrowser";
 import RecipeBrowser from "../recipe/RecipeBrowser";
 import ComponentsBrowser from "../component/ComponentBrowser";
 import ComponentEditor from "../component/ComponentEditor";
+import MealsBrowser from "../meal/MealBrowser";
+import MealEditor from "../meal/MealEditor";
 
 let states = [
     {
@@ -26,15 +27,7 @@ let states = [
     {
         name: 'root.home.ingredient_browser',
         url: '/ingredient',
-        component: IngredientsBrowser,
-        resolve: [{
-            token: 'browse',
-            resolveFn: () => {
-                return ({
-                    model: new Ingredient()
-                })
-            }
-        }]
+        component: IngredientsBrowser
     },
     {
         name: 'root.home.ingredient_editor',
@@ -60,6 +53,16 @@ let states = [
         name: 'root.home.component_editor',
         url: '/component/edit/:itemId',
         component: ComponentEditor
+    },
+    {
+        name: 'root.home.meal_browser',
+        url: '/meal',
+        component: MealsBrowser
+    },
+    {
+        name: 'root.home.meal_editor',
+        url: '/meal/edit/:itemId',
+        component: MealEditor
     }
 ];
 

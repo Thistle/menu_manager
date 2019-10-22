@@ -1,4 +1,4 @@
-import React, {Fragment} from "react";
+import React, {Component, Fragment} from "react";
 import InputWidget from "../widgets/InputWidget/InputWidget";
 import ItemsEditor from "../base_classes/ItemsEditor/ItemsEditor";
 import {Recipe, RecipeIngredient} from "../../ResourceManager/resources/Recipe";
@@ -13,20 +13,6 @@ export default class RecipeEditor extends ItemsEditor<any> {
         super(props, new Recipe());
     }
 
-    handleRemoveIngredient = (id: number, base_ingredient_name: string) => {
-        if (!window.confirm(`Are you sure you want to remove '${base_ingredient_name}'?`)) return;
-        this.recipeIngredientCTRL.objects.delete(id)
-            .then(() => {
-                this.state.model.reload()
-                    .then((response: any) => {
-                        this.setState({model: this.state.model})
-                    });
-            })
-            .catch((error: string) => {
-                window.alert('Unable to remove ingredient')
-            })
-    };
-
     handleAddIngredient = (id: number, modelName: string, value: string) => {
         if (this.state.model.ingredients.filter((ingredient: any) => {
             if (ingredient.base_ingredient.id === id) return ingredient;
@@ -35,30 +21,49 @@ export default class RecipeEditor extends ItemsEditor<any> {
             return;
         }
 
-        //todo: No good. Need to get a response that can be pushed onto INGREDIENTS instead of reloading the model.
         this.recipeIngredientCTRL.objects.create({
             base_ingredient: id,
             recipe: this.state.model.id
         })
             .then((response: any) => {
-                this.state.model.reload()
-                    .then((response: any) => {
-                        this.setState({model: this.state.model})
-                    });
+                this.state.model.ingredients.push(response);
+                this.setState({model: this.state.model});
             })
             .catch((error: any) => {
                 window.alert('Unable to add ingredient')
             })
     };
 
-    handleUpdateAmount = (id: string, value: string) => {
-        this.recipeIngredientCTRL.objects.update(parseInt(id.split('_')[2]), {quantity: value})
+    updateRecipeIngredientQuantity = (id: number, quantity: number) => {
+        console.log(quantity);
+        this.recipeIngredientCTRL.objects.update(id, {quantity})
             .catch((response: any) => {
                 window.alert('Unable to update ingredient.')
             })
     };
 
+    deleteRecipeIngredient = (id: number, base_ingredient_name: string) => {
+        if (!window.confirm(`Are you sure you want to remove '${base_ingredient_name}'?`)) return;
+        this.recipeIngredientCTRL.objects.delete(id)
+            .then(() => {
+                this.state.model.ingredients = this.state.model.ingredients.filter((ingredient: any) => {
+                    if (ingredient.id !== id) return ingredient;
+                });
+                this.setState({model: this.state.model})
+            })
+            .catch((error: string) => {
+                window.alert(`Unable to remove ingredient:\n\n${error}`)
+            })
+    };
+
     formContent = () => {
+        const ingredientComponents = this.state.model.ingredients.map((ingredient: RecipeIngredient) =>
+            <RecipeIngredientWidget recipeIngredient={ingredient}
+                                    onDelete={this.deleteRecipeIngredient}
+                                    onUpdate={this.updateRecipeIngredientQuantity}
+                                    key={`riw_${ingredient.id}`}
+
+            />);
         return (
             <div className={'row'}>
                 <div className={'col-md-6 col-12'}>
@@ -68,7 +73,7 @@ export default class RecipeEditor extends ItemsEditor<any> {
                                 <label htmlFor="name">Recipe Name</label>
                                 <InputWidget id={'name'}
                                              initialValue={this.state.model.name}
-                                             onHandleUpdate={this.handleInputWidgetUpdate}
+                                             onUpdate={this.handleInputWidgetUpdate}
                                 />
                             </div>
                             <div className={'col-md-6 col-12'}>
@@ -88,7 +93,7 @@ export default class RecipeEditor extends ItemsEditor<any> {
                                 <label htmlFor="buffer">Buffer</label>
                                 <InputWidget id={'buffer'}
                                              initialValue={this.state.model.buffer}
-                                             onHandleUpdate={this.handleInputWidgetUpdate}
+                                             onUpdate={this.handleInputWidgetUpdate}
                                              defaultUpdateValue={'0'}
                                 />
                             </div>
@@ -100,47 +105,14 @@ export default class RecipeEditor extends ItemsEditor<any> {
                         <div className={'col-12'}>
                             <div className={'row'}>
                                 <div className={'col-12 list-title'}>
-                                    Ingredients
+                                    <b>Ingredients</b>
                                 </div>
                             </div>
                             <hr/>
                             <div className={'row'}>
                                 <div className={'col-12 list-box'}>
-                                    {this.state.model.ingredients &&
-
-                                    this.state.model.ingredients.map((ingredient: any, index: number) => {
-                                        return (
-                                            <Fragment key={`recping_${index}`}>
-                                                <div className={'row list-item'}>
-                                                    <div className={'col-5'}>
-                                                        {ingredient.base_ingredient.thistle_culinary_name}
-                                                    </div>
-                                                    <div className={'col-4'}>
-                                                        <div className={'row'}>
-                                                            <div className={'col-9'}>
-                                                                <InputWidget id={`recping_amt_${ingredient.id}`}
-                                                                             initialValue={ingredient.quantity}
-                                                                             onHandleUpdate={this.handleUpdateAmount}
-                                                                             defaultUpdateValue={0}
-                                                                />
-                                                            </div>
-                                                            <div className={'col-2'}>
-                                                                oz
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    <div className={'col-1'}>
-                                                    </div>
-                                                    <div className={'col-2'}>
-                                                        <button className={'bg-danger text-white'}
-                                                                onClick={() => this.handleRemoveIngredient(ingredient.id, ingredient.base_ingredient.thistle_culinary_name)}>-
-                                                        </button>
-                                                    </div>
-                                                </div>
-                                                <hr/>
-                                            </Fragment>
-                                        )
-                                    })
+                                    {
+                                        ingredientComponents
                                     }
                                 </div>
                             </div>
@@ -150,7 +122,7 @@ export default class RecipeEditor extends ItemsEditor<any> {
                                 <div className={'col-12'}>
                                     <div className={'row'}>
                                         <div className={'col-12 list-title'}>
-                                            Add Ingredient
+                                            <b>+ Add Ingredient</b>
                                         </div>
                                     </div>
                                     <div className={'row'}>
@@ -175,7 +147,62 @@ export default class RecipeEditor extends ItemsEditor<any> {
     }
 }
 
-const RecipeIngredientDisplay = (props: any) => {
-    console.log(props)
+interface IRIWProps {
+    recipeIngredient: RecipeIngredient,
+    onDelete: any,
+    onUpdate: any
+}
 
-};
+export class RecipeIngredientWidget extends Component<IRIWProps, any> {
+    state: any;
+
+    constructor(props: any) {
+        super(props);
+        this.state = {
+            amount: props.recipeIngredient.quantity
+        };
+    }
+
+    updateQuantity = (id: string, value: string) => {
+        this.setState({amount: value});
+        this.props.onUpdate(this.props.recipeIngredient.id, value);
+    };
+
+    render() {
+        return (
+            <Fragment key={`recping_${this.props.recipeIngredient.id}`}>
+                <div className={'row list-item'}>
+                    <div className={'col-12'}>
+                        <div className={'row'}>
+                            <div className={'col-10'}>
+                                <u>{this.props.recipeIngredient.base_ingredient.thistle_culinary_name}</u>
+                            </div>
+                            <div className={'col-2'}>
+                                <button className={'bg-danger text-white'}
+                                        onClick={() => this.props.onDelete(this.props.recipeIngredient.id, this.props.recipeIngredient.base_ingredient.thistle_culinary_name)}>-
+                                </button>
+                            </div>
+                        </div>
+                        <div className={'row'}>
+                            <div className={'col-12'}>
+                                <div className={'row'}>
+                                    <div className={'col-5'}>
+                                        <InputWidget id={`recping_amt_${this.props.recipeIngredient.id}`}
+                                                     initialValue={this.state.amount}
+                                                     onUpdate={this.updateQuantity}
+                                                     defaultUpdateValue={0}
+                                        />
+                                    </div>
+                                    <div className={'col-3'}>
+                                        OZ
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <hr/>
+            </Fragment>
+        )
+    }
+}

@@ -22,6 +22,7 @@
  */
 import React, {Component} from 'react';
 import InputWidget from "../InputWidget/InputWidget";
+import "./SearchAndSelectWidget.css"
 
 interface IProps {
     id: string,
@@ -77,12 +78,12 @@ export default class SearchAndSelectWidget extends Component<IProps, any> {
 
     render() {
         return (
-            <div className={`row IngredientSAS`}>
+            <div className={`row SearchAndSelectWidget`}>
                 <div className={'col-12'} id={this.props.id}>
-                    <InputWidget id={'ingredientSAS-input'}
+                    <InputWidget id={'SAS-input'}
                                  placeholder={(typeof this.props.placeholder !== 'undefined') ? this.props.placeholder : ''}
-                                 onHandleUpdate={this.handleInputWidgetUpdated}/>
-                    <div className={'row IngredientSAS-list'} style={{height: '200px'}}>
+                                 onUpdate={this.handleInputWidgetUpdated}/>
+                    <div className={'row SAS-list form-control'} style={{height: '200px'}}>
                         <div className={'col-12'}>
                             {!this.state.isSearching
                             &&

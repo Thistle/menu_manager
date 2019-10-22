@@ -1,4 +1,6 @@
 import {IModel, RMModelBase} from '../base_classes/RMModelBase';
+import {Recipe} from "./Recipe";
+import {InventoryPackaging} from "./Inventory";
 
 interface IMenuItem extends IModel {
     name: string;
@@ -17,6 +19,26 @@ export class Meal extends RMModelBase implements IMenuItem {
     public _model = 'Meal';
 
     name: string = '';
+    slug: string = '';
+    description: string = '';
+    kitchen_instructions: string = '';
+    heating_instructions: string = '';
+    servings: number = 0;
+    suggested_serving: number = 0;
+    start_date: string = '';
+    end_date: string = '';
+    customer_photo: string = '';
+    plating_photo: string = '';
+
+    type: number = 0; //choices=((0, '---'), (1, 'salad'), (2, 'soup'), (3, 'breakfast'),(4, 'lunch'), (5, 'dinner'), (6, 'snack')))
+    container: number = 0;
+
+    public constructor() {
+        super();
+        this.init();
+    }
+
+
 }
 
 export class Component extends RMModelBase implements IMenuItem {
@@ -24,6 +46,13 @@ export class Component extends RMModelBase implements IMenuItem {
     public _model = 'Component';
 
     name: string = '';
+    serving_amount: number = 0;
+    suggested_serving: number = 0; // default=0, choices=((0, 'oz'), (1, 'ea'), (2, 'fl oz'))
+    standalone: boolean = false;
+    consumption_yield: number = 0;
+    servings: number = 0;
+    container: any = null;
+    recipe: any = null;
 
     public constructor() {
         super();

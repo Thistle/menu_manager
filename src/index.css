@@ -107,6 +107,10 @@ code {
     float: left;
 }
 
+#items-browser .add-item-bar {
+    padding: 5px;
+}
+
 .add-item-link {
     font-weight: bold;
     font-size: 1.5em;
@@ -196,4 +200,8 @@ code {
 /* dev work flags */
 .under-construction {
     background-color: rgba(255, 255, 0, .2)
+}
+
+Label {
+    font-weight: bold;
 }

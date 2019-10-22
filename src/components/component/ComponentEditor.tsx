@@ -27,12 +27,13 @@ export default class ComponentEditor extends ItemsEditor<any> {
     };
 
     handleSetRecipe = (id: number, modelName: string, value: string) => {
-        this.state.model.update({recipe: id})
+        this.updateProperty('recipe', id)
             .then((r: any) => {
-                this.state.model[id] = value;
-                this.setState({model: this.state.model})
+                this.state.model.reload()
+                    .then((r: any) => {
+                        this.setState({model: this.state.model})
+                    })
             })
-
     };
 
     formContent = () => {
@@ -53,14 +54,14 @@ export default class ComponentEditor extends ItemsEditor<any> {
                                             <label htmlFor="name">Name</label>
                                             <InputWidget id={'name'}
                                                          initialValue={this.state.model.name}
-                                                         onHandleUpdate={this.handleInputWidgetUpdate}
+                                                         onUpdate={this.handleInputWidgetUpdate}
                                             />
                                         </div>
                                         <div className={'col-md-6 col-12'}>
                                             <label htmlFor="slug">Slug</label>
                                             <InputWidget id={'slug'}
                                                          initialValue={this.state.model.slug}
-                                                         onHandleUpdate={this.handleInputWidgetUpdate}
+                                                         onUpdate={this.handleInputWidgetUpdate}
                                             />
                                         </div>
                                     </div>
@@ -69,7 +70,7 @@ export default class ComponentEditor extends ItemsEditor<any> {
                                             <label htmlFor="serving_amount">Serving Amount (oz)</label>
                                             <InputWidget id={'serving_amount'}
                                                          initialValue={this.state.model.serving_amount}
-                                                         onHandleUpdate={this.handleInputWidgetUpdate}
+                                                         onUpdate={this.handleInputWidgetUpdate}
                                             />
                                         </div>
                                         <div className={'col-md-6 col-12'}>
@@ -80,13 +81,13 @@ export default class ComponentEditor extends ItemsEditor<any> {
                                                     value={this.state.model.container}
                                             >
                                                 <option value={''}>No Container</option>
-                                                {this.state.containers &&
-                                                this.state.containers.map((container: any, index: number) => {
-                                                    return (
-                                                        <option key={`container_${index}`}
-                                                                value={container.id}>{container.order_name}</option>
-                                                    );
-                                                })
+                                                {
+                                                    this.state.containers.map((container: any, index: number) => {
+                                                        return (
+                                                            <option key={`container_${index}`}
+                                                                    value={container.id}>{container.order_name}</option>
+                                                        );
+                                                    })
                                                 }
                                             </select>
                                         </div>

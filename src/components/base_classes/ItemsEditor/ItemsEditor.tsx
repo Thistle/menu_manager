@@ -23,18 +23,23 @@ export default class ItemsEditor<T> extends Component<any, any> {
     }
 
     componentDidMount() {
-        this.state.model.load(this.state.item_id).then((response: any) => {
+        this.state.model.load(this.state.item_id)
+            .then((response: any) => {
                 this.setState({
                     model: this.state.model,
                     is_loading: false
                 })
-            }
-        )
+            })
+            .catch((r: any) => {
+                window.alert(`Unable to load ${this.state.model.modelName}`)
+                window.location.href = `/home/${this.state.model.modelName}`;//todo: sort out routing
+            })
     };
 
-    updateProperty = (property: string, value: any) => {
-        this.state.model.update({[property]: value})
+    updateProperty = (property: string, value: any): Promise<any> => {
+        return this.state.model.update({[property]: value})
             .then((r: any) => {
+                console.log('reload');
                 //(this.state.model as any)[property] = value;
                 this.setState({
                     model: this.state.model

@@ -1,0 +1,12 @@
+.SearchAndSelectWidget {
+}
+
+.SearchAndSelectWidget .SAS-input {
+}
+
+.SearchAndSelectWidget .SAS-list {
+    height: 200px;
+    overflow-y: auto;
+    margin-top: 5px;
+    margin-left: 0;
+}

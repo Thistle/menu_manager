@@ -31,7 +31,9 @@ export abstract class RMModelBase {
     private _objects: ObjectsManager = new ObjectsManager();
     private _service: Service = new Service();
     private _start_data: any = this.getRawModel(this);
-    private _has_loaded: boolean = false;
+    private _has_loaded: boolean = false;// todo: get rid of this. Test ID instead
+    private _in_test_mode: boolean = false;
+    private _is_new: boolean = false; // is used by applications to know if the instance is a placeholder while user creates initial data
 
     // the name expected by the API.
     public get modelName(): string {
@@ -51,20 +53,32 @@ export abstract class RMModelBase {
         return this._start_data
     }
 
+    public get isNew(): boolean{
+        return this._is_new
+    }
+
     public constructor() {
     }
 
-    public load(id: number, forceLoad: boolean = false): Promise<any> {
-        if (this._has_loaded && !forceLoad) return Promise.reject({error: 'cannot_be_reloaded'});
-        return this._service.get(this.getURL(`${id}/`))
-            .then((response: any) => {
-                return (this.synthesize(response));
-            })
+    public setTestModelProperties(properties: any) {
+        this._in_test_mode = true;
+        this.synthesize(properties);
     }
 
-    //todo: DO I need this?
-    public reload(): Promise<any> {
-        return this.load(this.id, true);
+    public load(id: number = -1): Promise<any> {
+        if (this._has_loaded) return Promise.reject({error: 'cannot_be_reloaded'});
+        if (id !== -1){// loading existing model
+            return this._service.get(this.getURL(`${id}/`))
+            .then((response: any) => {
+                this._is_new = true;
+                return (this.synthesize(response));
+            })
+        }else{
+            return this.objects.create(this.getRawModel(this))
+                .then((resp: any) => {
+                    return this.synthesize(resp);
+                });
+        }
     }
 
     public save(): Promise<any> {
@@ -76,22 +90,10 @@ export abstract class RMModelBase {
     }
 
     public update(properties_to_update: any): Promise<any> {
-        Object.assign(this, properties_to_update);
-        if (!this.hasUnsavedUpdates) return Promise.resolve(this._start_data);
-        /*
-        send updated properties
-                server returns object with updated properties and their new values
-                blend properties into model
-                return updated fields
-                RMModelBase should be handling all updating. APPS should not be changing the data directly.
-        */
         return this._service.patch(this.getURL(`${this.id}/`), properties_to_update)
             .then((response: any) => {
                 return (this.synthesize(response));
             })
-
-
-
     }
 
     public delete(): Promise<any> {

@@ -53,7 +53,7 @@ export default class AddItemWidget extends Component <IProps, IState> {
 
     render() {
         return (
-            <div className={'row'}>
+            <div className={'row add-item-bar'}>
                 <div className={'col-12'}>
                     <div className={'row'}>
                         <div className={'col-12'}>

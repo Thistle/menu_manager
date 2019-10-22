@@ -6,9 +6,9 @@
 
     <InputWidget    initialValue: starting value
                     defaultUpdateValue: if the INPUT field is empty, this value will be returned instead.
-                    onHandleUpdate: callback when there is new text
+                    onUpdate: callback when there is new text
                     placeholder: text for PLACEHOLDER property on INPUT
-                    type: not yet implemented
+                    type: text | textarea
 
     returns     id: value of ID sent through props
                 value: string
@@ -19,12 +19,13 @@ import React, {Component} from 'react';
 interface IState {
     currentValue: string;
     defaultUpdateValue: string;
+    inputType: string
 }
 
 interface IProps {
     id: string,
-    initialValue?: string
-    onHandleUpdate: any,
+    initialValue?: any,
+    onUpdate: any,
     placeholder?: string,
     type?: string
     defaultUpdateValue?: any
@@ -42,7 +43,8 @@ export default class InputWidget extends Component<IProps, IState> {
         super(props);
         this.state = {
             currentValue: (typeof props.initialValue !== 'undefined') ? props.initialValue : '',
-            defaultUpdateValue: props.defaultUpdateValue
+            defaultUpdateValue: props.defaultUpdateValue,
+            inputType: (typeof props.type !== 'undefined') ? props.type : 'text'
         };
         this.type = (typeof this.props.type !== 'undefined') ? this.props.type : 'text';
     };
@@ -61,9 +63,8 @@ export default class InputWidget extends Component<IProps, IState> {
     sendUpdate = () => {
         if (this.state.currentValue !== this.lastSavedValue) {
             this.lastSavedValue = this.state.currentValue;
-            let value = this.state.currentValue;
-            if (this.state.defaultUpdateValue !== '' && value === '') value = this.state.defaultUpdateValue;
-            this.props.onHandleUpdate(this.props.id, value);
+            let value = (this.state.defaultUpdateValue !== '' && this.state.currentValue === '') ? this.state.defaultUpdateValue : this.state.currentValue;
+            this.props.onUpdate(this.props.id, value);
             clearInterval(this.timer);
         }
     };
@@ -74,22 +75,43 @@ export default class InputWidget extends Component<IProps, IState> {
     };
 
     render() {
-        return (
-            <div className={'row input-widget'}>
-                <div className={'col-12'}>
-                    <input
-                        className={'form-control iw'}
-                        id={this.props.id}
-                        placeholder={this.props.placeholder}
-                        value={this.state.currentValue}
-                        onBlur={() => this.sendUpdate()}
-                        onChange={(e) => this.handleOnChange(e)}
-                        onInput={(e) => this.handleOnChange(e)}
-                        onKeyUp={(e) => this.handleOnChange(e)}
-                        onKeyDown={(e) => this.handleOnKeyPress(e)}
-                    />
+        if (this.state.inputType === 'textarea') {
+            return (
+                <div className={'row input-widget'}>
+                    <div className={'col-12'}>
+                        <textarea
+                            className={'form-control iw'}
+                            id={this.props.id}
+                            onBlur={() => this.sendUpdate()}
+                            onChange={(e) => this.handleOnChange(e)}
+                            onInput={(e) => this.handleOnChange(e)}
+                            onKeyUp={(e) => this.handleOnChange(e)}
+                            onKeyDown={(e) => this.handleOnKeyPress(e)}
+                        >
+                            {this.state.currentValue}
+                        </textarea>
+                    </div>
                 </div>
-            </div>
-        )
+            )
+        } else {
+            return (
+                <div className={'row input-widget'}>
+                    <div className={'col-12'}>
+                        <input
+                            className={'form-control iw'}
+                            id={this.props.id}
+                            placeholder={this.props.placeholder}
+                            value={this.state.currentValue}
+                            onBlur={() => this.sendUpdate()}
+                            onChange={(e) => this.handleOnChange(e)}
+                            onInput={(e) => this.handleOnChange(e)}
+                            onKeyUp={(e) => this.handleOnChange(e)}
+                            onKeyDown={(e) => this.handleOnKeyPress(e)}
+                        />
+                    </div>
+                </div>
+            )
+        }
+
     }
 }
