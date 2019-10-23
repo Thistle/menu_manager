@@ -18,12 +18,7 @@ export default class ItemsBrowser<T> extends Component<any, any> {
         this.state = {
             ...{
                 model: model,
-                is_loading: true,
-                list: [],
-                pagination: {
-                    pages: 0,
-                    page: 0
-                }
+                list: null
             },
             ...{stateDefaults}
         };
@@ -38,15 +33,11 @@ export default class ItemsBrowser<T> extends Component<any, any> {
     };
 
     doSearch = (searchPattern: string = '', page: number = 1, offset: number = 0, limit: number = this.search_limit) => {
+        this.setState({list: null});
         this.state.model.objects.search(searchPattern, {limit: limit, page: page, offset: offset})
             .then((r: any) => {
                 this.setState({
-                    is_loading: false,
-                    list: r.results,
-                    pagination: {
-                        page: 1,
-                        pages: r.count / limit
-                    }
+                    list: r.results
                 })
             });
     };
@@ -54,7 +45,8 @@ export default class ItemsBrowser<T> extends Component<any, any> {
     formContent = () => <div>implement getFormContent</div>;
 
     render() {
-        if (this.state.is_loading) return (<div>Loading...</div>);
+        const output = (!this.state.list)?
+            'Loading...' : this.formContent();//todo: move this control to inheritors
 
         return (
             <Fragment>
@@ -80,7 +72,7 @@ export default class ItemsBrowser<T> extends Component<any, any> {
                 </div>
                 <Fragment>
                     {
-                        this.formContent()
+                        output
                     }
                 </Fragment>
             </Fragment>

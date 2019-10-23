@@ -32,10 +32,9 @@ describe('loading RMMODEL data', () => {
     });
 
     it('should throw an error if LOAD is called more than once', async () => {
-        await o.load(1);
+        o.id = 1;
         let t = await o.load(2).catch((error) => error);
-        expect(t).toHaveProperty('error');
-        expect(t.error).toEqual('cannot_be_reloaded')
+        expect(t).toEqual({error: 'cannot_be_reloaded'})
     });
 });
 
@@ -57,11 +56,6 @@ describe('test hasUnsavedUpdates()', () => {
     it('should return TRUE after value is set.', () => {
         o.name = 'updated_model_name';
         expect(o.hasUnsavedUpdates).toBe(true);
-    });
-
-    it('should return FALSE after loading', async () => {
-        await o.load(1);
-        expect(o.hasUnsavedUpdates).toEqual(false)
     });
 
     it('should return FALSE after saving', () => {

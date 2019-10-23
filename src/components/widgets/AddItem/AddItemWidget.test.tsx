@@ -25,8 +25,4 @@ describe('AddItem Widget tests', () => {
     it('should show errros', () => {
         // manually test
     });
-
-    it('should redirect through uirouter', () => {
-        throw new Error();
-    });
 });

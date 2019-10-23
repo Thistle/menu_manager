@@ -13,7 +13,7 @@ describe('InputWidget widget tests', () => {
         wrapper = shallow(<InputWidget
             id={'test_id'}
             initialValue={'initial_value_text'}
-            onHandleUpdate={onHandleUpdate}
+            onUpdate={onHandleUpdate}
             placeholder={'test_placeholder'}
         />);
         input_element = wrapper.find('input');
@@ -61,9 +61,9 @@ describe('InputWidget widget tests', () => {
             wrapper = shallow(<InputWidget
                 id={'test_id'}
                 initialValue={'initial_value_text'}
-                onHandleUpdate={onHandleUpdate}
+                onUpdate={onHandleUpdate}
                 placeholder={'test_placeholder'}
-                defaultUpdateValue={'hello'}
+                defaultUpdateValue={''}
             />);
             wrapper.instance().setState({currentValue: ''});
             input_element = wrapper.find('input');

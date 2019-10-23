@@ -15,9 +15,7 @@ export interface IMealComponentEditorProps{
 
 interface IState{
     model: Component,
-    is_loading: boolean,
-    containers: [],
-    isNewComponent: boolean
+    containers: any
 }
 
 export default class MealComponentEditor extends ReactComponent<IMealComponentEditorProps, IState> {
@@ -27,23 +25,12 @@ export default class MealComponentEditor extends ReactComponent<IMealComponentEd
 
         this.state = {
             model: props.model,
-            is_loading: true,
-            containers: [],
-            isNewComponent: (props.componentID === -1)
+            containers: null
         };
     }
 
     updateProperty = (property: string, value: any) => {
         return this.state.model.update({[property]: new Date(value)})
-    };
-
-    handleInputWidgetUpdate = (id: string, value: any) => {
-        this.updateProperty(id, value)
-    };
-
-    handleOnBlur = (e: any) => {
-        e.preventDefault();
-        this.updateProperty(e.target.id, e.target.value);
     };
 
     setContainer = (e: any) => {
@@ -60,11 +47,7 @@ export default class MealComponentEditor extends ReactComponent<IMealComponentEd
             return;
         }
 
-        let errors: string[] = this.formHasErrors();
-        if(errors.length > 0){
-            window.alert(`Component cannot be saved for the following reasons:\n\n${errors.toString()}`);
-            return;
-        }
+        if (this.formHasErrors()) return;
 
         this.state.model.save()
             .then((r: any) => {
@@ -73,10 +56,13 @@ export default class MealComponentEditor extends ReactComponent<IMealComponentEd
             })
     };
 
-    formHasErrors = (): string[] => {
+    formHasErrors = (): boolean => {
         let errors: string[] = [];
         if(this.state.model.recipe === null) errors.push('No recipe selected');
-        return errors;
+
+        if(errors.length > 0) window.alert(`Component cannot be saved for the following reasons:\n\n${errors.toString()}`);
+
+        return (errors.length !== 0);
     };
 
     cancelUpdating = () => {
@@ -90,7 +76,6 @@ export default class MealComponentEditor extends ReactComponent<IMealComponentEd
         new InventoryPackaging().objects.all()
             .then((values) => {
                 this.setState({
-                    is_loading: false,
                     containers: values.results
                 })
             })
@@ -103,7 +88,7 @@ export default class MealComponentEditor extends ReactComponent<IMealComponentEd
                     <div className={'col-12'}>
                         <div className={'row'}>
                             <div className={'col-12'}>
-                                <h3>{`${(this.state.isNewComponent)? 'Edit':'Add'} Component`}</h3>
+                                <h3>{`${(this.state.model.id === -1)? 'Add':'Edit'} Component`}</h3>
                             </div>
                         </div>
                         <div className={'row'}>
@@ -119,10 +104,10 @@ export default class MealComponentEditor extends ReactComponent<IMealComponentEd
                                                     value={(this.props.model.container !== null)? this.props.model.container.id:''}
                                             >
                                                 <option value={''}>
-                                                    {(this.state.is_loading)? 'Loading...':'No Container Selected'}
+                                                    {(this.state.containers)? 'No Container Selected':'Loading...'}
                                                 </option>
 
-                                                {
+                                                {this.state.containers &&
                                                     this.state.containers.map((container: any, index: number) => {
                                                         return (
                                                             <option key={`container_${index}`}

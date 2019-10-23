@@ -1,5 +1,5 @@
 /*
-    This widget combines an InputWidget with a list area that allows the consumer to search 1 or more RMmodels.
+    This widget combines an InputWidget with a list area that allows the user to search 1 or more RMModels.
     Can search multiple RMModels
         <SearchAndSelectWidget searchModels={[
                                                 {
@@ -15,6 +15,7 @@
                             searchModels: array of RMModels to search
                             onSelect: callback when item is selected
                             placeholder: placeholder for the INPUT
+
     returns     id: number
                 model: from RMModelBase.modelName
                 value: string
@@ -87,7 +88,6 @@ export default class SearchAndSelectWidget extends Component<IProps, any> {
                             }
                         </div>
                     </div>
-
                 </div>
             </div>
         )

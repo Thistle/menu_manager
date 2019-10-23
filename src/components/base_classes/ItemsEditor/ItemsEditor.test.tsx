@@ -1,6 +1,6 @@
 import React from 'react';
 import {shallow} from "enzyme";
-import IngredientEditor from "../../ingredient/IngredientEditor";
+import MealEditor from "../../meal/MealEditor";
 
 describe('ItemsEditor tests', () => {
     let wrapper: any;
@@ -9,7 +9,7 @@ describe('ItemsEditor tests', () => {
     };
 
     beforeEach(() => {
-        wrapper = shallow(<IngredientEditor {...props} />, {disableLifecycleMethods: true});
+        wrapper = shallow(<MealEditor {...props} />, {disableLifecycleMethods: true});
     });
 
     it('should display loading message until loading completes', () => {

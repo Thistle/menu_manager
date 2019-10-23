@@ -22,7 +22,7 @@ describe('ItemsBrowser tests', () => {
 
     it('should display loading message until loading completes', () => {
         expect(wrapper.text()).toContain('Loading...');
-        wrapper.setState({is_loading: false});
+        wrapper.setState({list: []});
         expect(wrapper.text()).not.toContain('Loading...');
     });
 

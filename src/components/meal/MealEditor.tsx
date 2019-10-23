@@ -31,25 +31,23 @@ export default class MealEditor extends ItemsEditor<any> {
 
     updateDate = (id: string, selectedDate: string) => {
         let dates: any = {[id]: selectedDate};
-        let date: Date = new Date(new Date(selectedDate).toLocaleString("en-US", {timeZone: "America/Los_Angeles"}));
-        let startDate: Date = new Date(this.state.model.start_date);// new Date(new Date(this.state.model.start_date).toLocaleString("en-US", {timeZone: "America/Los_Angeles"}));
-        let endDate: Date = new Date(this.state.model.end_date);
+        let date: Date =new Date(selectedDate);
 
-        if ( (id === 'start_date' && this.state.model.end_date && (endDate.getTime() < date.getTime())) ||
-            (id === 'end_date' && this.state.model.start_date && (startDate.getTime() > date.getTime()))){
+        const dateToString = (date: Date): string => {
+            let d_string: string = date.toISOString();
+            return d_string.substring(0, d_string.indexOf('T'));
+        };
+
+        if ( (id === 'start_date' && this.state.model.end_date && (new Date(this.state.model.end_date).getTime() < date.getTime())) ||
+            (id === 'end_date' && this.state.model.start_date && (new Date(this.state.model.start_date).getTime() > date.getTime()))){
             window.alert('The start date needs to be before or the same as the end date');
             return;
         }
 
-        if (id === 'start_date' && this.state.model.end_date === null) dates['end_date'] = this.dateToString(date);
-        if (id === 'end_date' && this.state.model.start_date === null) dates['start_date'] = this.dateToString(date);
+        if (id === 'start_date' && this.state.model.end_date === null) dates['end_date'] = dateToString(date);
+        if (id === 'end_date' && this.state.model.start_date === null) dates['start_date'] = dateToString(date);
 
         this.updateProperties(dates);
-    };
-
-    dateToString = (date: Date): string => {
-        let d_string: string = date.toISOString();
-        return d_string.substring(0, d_string.indexOf('T'));
     };
 
     updateContainer = (e: any) => {

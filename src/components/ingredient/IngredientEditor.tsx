@@ -18,14 +18,6 @@ export default class IngredientEditor extends ItemsEditor<any> {
         });
     }
 
-    handleButtonWidgetClicked = (target_element_id: string) => {
-            if (target_element_id === 'available-allergens') {
-                this.addAllergen();
-            }else{
-                window.alert(`Invalid button widget ID: ${target_element_id}`);
-            }
-    };
-
     addAllergen = () => {
         this.setState({add_allergen_btn_mode: 'disabled'});
 
@@ -205,8 +197,9 @@ export default class IngredientEditor extends ItemsEditor<any> {
                                     </div>
                                     <div className={'row'}>
                                         <div className={'col-10 '}>
-                                            <select className={'form-control'} id={'available-allergens'}
-                                                    name={'allergens'}>
+                                            <select className={'form-control'}
+                                                    id={'available-allergens'}
+                                                    >
                                                 {
                                                     available_allergens
                                                 }
@@ -216,7 +209,7 @@ export default class IngredientEditor extends ItemsEditor<any> {
                                             <ButtonWidget
                                                 id={'add-allergen-btn'}
                                                 label={'+'}
-                                                onClickHandler={this.handleButtonWidgetClicked}
+                                                onClickHandler={this.addAllergen()}
                                                 classes={'bg-success text-white'}
                                                 mode={this.state.add_allergen_btn_mode}
                                                 target_element_id={'available-allergens'}

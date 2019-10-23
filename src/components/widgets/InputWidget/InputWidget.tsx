@@ -47,6 +47,7 @@ export default class InputWidget extends Component<IProps, IState> {
             inputType: (typeof props.type !== 'undefined') ? props.type : 'text'
         };
         this.type = (typeof this.props.type !== 'undefined') ? this.props.type : 'text';
+        this.lastSavedValue = this.state.currentValue;
     };
 
     handleOnKeyPress = (e: any) => {

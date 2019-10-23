@@ -24,7 +24,6 @@ export default class DatePickerWidget extends Component<IProps, any> {
 
     onChange = (dateString: any) => {console.log(dateString);
         let date: any = new Date(dateString).toISOString();
-        console.log(date);
         this.props.onChange(this.props.id, date.substring(0, date.indexOf('T')));
     };
 

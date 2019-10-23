@@ -2,6 +2,7 @@ import React from 'react';
 import {shallow} from 'enzyme';
 import MealComponentEditor from "./MealComponentEditor";
 import {Component} from "../../ResourceManager/resources/Menu";
+import MealEditor from "./MealEditor";
 
 describe('MealComponentEditor tests', () => {
     let wrapper: any;
@@ -13,7 +14,7 @@ describe('MealComponentEditor tests', () => {
 
     beforeEach(() => {
         wrapper = shallow(<MealComponentEditor  model={model}
-                                                onFinishedUpdating={updateComponent}/>)
+                                                onFinishedUpdating={updateComponent}/>, {disableLifecycleMethods: true})
     });
 
     it('should set title to "Add Component"', () => {
@@ -21,7 +22,7 @@ describe('MealComponentEditor tests', () => {
     });
 
     it('should show "Loading..." in containers', () => {
-        expect(wrapper.find('#container').children().at(0).text()).toBe('Loading...');
+        expect(wrapper.text()).toContain('Loading...');
     });
 
     describe ('Editing tests', () => {
