@@ -62,7 +62,8 @@ export default class SearchAndSelectWidget extends Component<IProps, any> {
             return (
                 <div className={'row'} key={`sas_${searchModel.model.modelName}_${index}`}>
                     <div className={'col-12 browser-list-line'}
-                         onClick={() => this.props.onSelect(result.id, searchModel.model.modelName, result[searchModel.displayField])}>
+                         onClick={() => this.props.onSelect(result.id, searchModel.model.modelName, result[searchModel.displayField])}
+                    >
                         {result[searchModel.displayField]}
                     </div>
                 </div>
@@ -81,7 +82,7 @@ export default class SearchAndSelectWidget extends Component<IProps, any> {
                                  onUpdate={this.handleInputWidgetUpdated}/>
                     <div className={'row SAS-list form-control'} style={{height: '200px'}}>
                         <div className={'col-12'}>
-                            {!this.state.list &&
+                            {this.state.list &&
                                 <div>{this.state.list}</div>
                             }
                         </div>

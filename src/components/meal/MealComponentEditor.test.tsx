@@ -13,7 +13,7 @@ describe('MealComponentEditor tests', () => {
 
     beforeEach(() => {
         wrapper = shallow(<MealComponentEditor  model={model}
-                                                onUpdateComponent={updateComponent}/>)
+                                                onFinishedUpdating={updateComponent}/>)
     });
 
     it('should set title to "Add Component"', () => {
@@ -31,7 +31,7 @@ describe('MealComponentEditor tests', () => {
                 id: 666
             });
             wrapper = shallow(<MealComponentEditor  model={model}
-                                                    onUpdateComponent={updateComponent}/>)
+                                                    onFinishedUpdating={updateComponent}/>)
         });
 
         it('should set title to "Edit Component"', () => {

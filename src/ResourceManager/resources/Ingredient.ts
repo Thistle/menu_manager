@@ -50,3 +50,15 @@ export class Preparation extends RMModelBase {
         this.init();
     }
 }
+
+export class RecipalIngredient extends (RMModelBase){
+    public _resource = 'ingredient';
+    public _model = 'recipalingredient';
+
+    public description: string = '';
+
+    public constructor() {
+        super();
+        this.init();
+    }
+}

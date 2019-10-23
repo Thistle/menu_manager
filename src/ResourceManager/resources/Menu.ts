@@ -18,6 +18,7 @@ export class Meal extends RMModelBase implements IMenuItem {
     end_date: string = '';
     customer_photo: string = '';
     plating_photo: string = '';
+    components: [] = [];
 
     type: number = 0; //choices=((0, '---'), (1, 'salad'), (2, 'soup'), (3, 'breakfast'),(4, 'lunch'), (5, 'dinner'), (6, 'snack')))
     container: number = 0;
@@ -38,7 +39,6 @@ export class Component extends RMModelBase implements IMenuItem {
     container: any = null;
     recipe: any = null;
     kitchen_instructions: string = '';
-    meal: any = null;
 
     public constructor() {
         super();

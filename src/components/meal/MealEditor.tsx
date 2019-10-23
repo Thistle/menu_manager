@@ -6,8 +6,9 @@ import {InventoryPackaging} from "../../ResourceManager/resources/Inventory";
 import MealComponentEditor from "./MealComponentEditor";
 import "./Meal.css";
 import ButtonWidget from "../widgets/ButtonWidget/ButtonWidget";
-import DatePicker from 'react-datepicker';
-import "react-datepicker/dist/react-datepicker.css";
+import DatePickerWidget from "../widgets/DatePickerWidget/DatePickerWidget";
+
+
 
 export default class MealEditor extends ItemsEditor<any> {
 
@@ -28,7 +29,33 @@ export default class MealEditor extends ItemsEditor<any> {
         this.setState({component_being_edited: null})
     };
 
-    updateDate = () => {};
+    updateDate = (id: string, selectedDate: string) => {
+        let dates: any = {[id]: selectedDate};
+        let date: Date = new Date(new Date(selectedDate).toLocaleString("en-US", {timeZone: "America/Los_Angeles"}));
+        let startDate: Date = new Date(this.state.model.start_date);// new Date(new Date(this.state.model.start_date).toLocaleString("en-US", {timeZone: "America/Los_Angeles"}));
+        let endDate: Date = new Date(this.state.model.end_date);
+
+        if ( (id === 'start_date' && this.state.model.end_date && (endDate.getTime() < date.getTime())) ||
+            (id === 'end_date' && this.state.model.start_date && (startDate.getTime() > date.getTime()))){
+            window.alert('The start date needs to be before or the same as the end date');
+            return;
+        }
+
+        if (id === 'start_date' && this.state.model.end_date === null) dates['end_date'] = this.dateToString(date);
+        if (id === 'end_date' && this.state.model.start_date === null) dates['start_date'] = this.dateToString(date);
+
+        this.updateProperties(dates);
+    };
+
+    dateToString = (date: Date): string => {
+        let d_string: string = date.toISOString();
+        return d_string.substring(0, d_string.indexOf('T'));
+    };
+
+    updateContainer = (e: any) => {
+        this.updateProperty('container', {id: parseInt(e.target.value)})
+    };
+
 
     componentDidMount = () => {
         super.componentDidMount();
@@ -42,7 +69,8 @@ export default class MealEditor extends ItemsEditor<any> {
     };
 
     formContent = () => {
-        const components = this.state.model.components.map((component: Component) => <div>component</div>);
+        const components = (!this.state.model.components)?
+            []: this.state.model.components.map((component: Component) => <div>component</div>);
 
         return (
             <Fragment>
@@ -74,10 +102,18 @@ export default class MealEditor extends ItemsEditor<any> {
                                             />
                                         </div>
                                         <div className={'col-md-6 col-12'}>
-                                            <DatePicker
-                                              selected={this.state.date}
-                                              onChange={this.updateDate}
-                                            />
+                                            <label htmlFor="start_date">Start Date</label>
+                                            <DatePickerWidget id={'start_date'}
+                                                              selected={this.state.model.start_date}
+                                                              onChange={this.updateDate}
+                                                              />
+                                        </div>
+                                        <div className={'col-md-6 col-12'}>
+                                            <label htmlFor="start_date">End Date</label>
+                                            <DatePickerWidget id={'end_date'}
+                                                              selected={this.state.model.end_date}
+                                                              onChange={this.updateDate}
+                                                              />
                                         </div>
                                         <div className={'col-md-6 col-12'}>
                                             <label htmlFor="type">Meal Type</label>
@@ -98,7 +134,7 @@ export default class MealEditor extends ItemsEditor<any> {
                                             <label htmlFor="container">Container</label>
                                             <select className={'form-control'}
                                                     id={'container'}
-                                                    onChange={this.handleOnBlur}
+                                                    onChange={this.updateContainer}
                                                     value={(this.state.model.container !== null)? this.state.model.container.id:''}>
                                                 <option value={''}>No Container</option>
                                                 {

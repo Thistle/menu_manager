@@ -1,6 +1,6 @@
 import React from "react";
 import {Allergen, Ingredient, Preparation} from "../../ResourceManager/resources/Ingredient";
-import {RecipalIngredient} from "../../ResourceManager/resources/Recipal";
+import {RecipalIngredient} from "../../ResourceManager/resources/Ingredient";
 import InputWidget from "../widgets/InputWidget/InputWidget"
 import ButtonWidget from "../widgets/ButtonWidget/ButtonWidget";
 import ItemsEditor from "../base_classes/ItemsEditor/ItemsEditor";

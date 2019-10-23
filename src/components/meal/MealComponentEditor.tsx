@@ -34,7 +34,7 @@ export default class MealComponentEditor extends ReactComponent<IMealComponentEd
     }
 
     updateProperty = (property: string, value: any) => {
-        return this.state.model.update({[property]: value})
+        return this.state.model.update({[property]: new Date(value)})
     };
 
     handleInputWidgetUpdate = (id: string, value: any) => {

@@ -37,13 +37,17 @@ export default class ItemsEditor<T> extends Component<any, any> {
     };
 
     updateProperty = (property: string, value: any): Promise<any> => {
-        return this.state.model.update({[property]: value})
+        return this.updateProperties({[property]: value})
+    };
+
+    updateProperties = (properties: any): Promise<any> => {
+        return this.state.model.update(properties)
             .then((r: any) => {
                 this.setState({
                     model: this.state.model
                 });
             });
-    };
+    }
 
     handleInputWidgetUpdate = (id: string, value: any) => {
         this.updateProperty(id, value);

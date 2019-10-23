@@ -8,8 +8,6 @@ import RecipeEditor from "../recipe/RecipeEditor";
 import IngredientEditor from "../ingredient/IngredientEditor";
 import IngredientsBrowser from "../ingredient/IngredientBrowser";
 import RecipeBrowser from "../recipe/RecipeBrowser";
-import ComponentsBrowser from "../component_dep/ComponentBrowser";
-import ComponentEditor from "../component_dep/ComponentEditor";
 import MealsBrowser from "../meal/MealBrowser";
 import MealEditor from "../meal/MealEditor";
 
@@ -43,16 +41,6 @@ let states = [
         name: 'root.home.recipe_editor',
         url: '/recipe/edit/:itemId',
         component: RecipeEditor
-    },
-    {
-        name: 'root.home.component_browser',
-        url: '/component',
-        component: ComponentsBrowser
-    },
-    {
-        name: 'root.home.component_editor',
-        url: '/component/edit/:itemId',
-        component: ComponentEditor
     },
     {
         name: 'root.home.meal_browser',
